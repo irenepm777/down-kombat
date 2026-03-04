@@ -1,8 +1,7 @@
 package com.downkombat;
 
+import com.downkombat.game.GameScene;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 /**
@@ -12,11 +11,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        Pane root = new Pane();
-        Scene scene = new Scene(root, 1000, 600);
+
+        GameScene game = new GameScene();
 
         stage.setTitle("DOWN KOMBAT");
-        stage.setScene(scene);
+        stage.setScene(game.getScene());
         stage.show();
     }
 

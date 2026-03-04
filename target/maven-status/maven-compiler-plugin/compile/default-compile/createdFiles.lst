@@ -1,1 +1,5 @@
+com/downkombat/game/GameScene.class
+com/downkombat/input/InputHandler.class
+com/downkombat/game/Player.class
+com/downkombat/engine/GameLoop.class
 com/downkombat/Main.class
