@@ -59,5 +59,17 @@ private void update() {
     if (input.isPressed(KeyCode.RIGHT)) {
         player2.moveRight();
     }
+
+    // evitar que los jugadores se atraviesen
+    if (player1.getBody().getBoundsInParent().intersects(player2.getBody().getBoundsInParent())) {
+
+        if (player1.getBody().getTranslateX() < player2.getBody().getTranslateX()) {
+            player1.moveLeft();
+            player2.moveRight();
+        } else {
+            player1.moveRight();
+            player2.moveLeft();
+        }
+    }
 }
 }
