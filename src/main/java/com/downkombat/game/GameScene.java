@@ -10,6 +10,7 @@ import javafx.scene.input.KeyCode;
 
 public class GameScene {
 
+    private boolean gameOver = false;
     private Scene scene;
     private InputHandler input;
 
@@ -42,6 +43,10 @@ public class GameScene {
 
 private void update() {
 
+    if (gameOver) {
+        return;
+    }
+
     // Player 1
     if (input.isPressed(KeyCode.A)) {
         player1.moveLeft();
@@ -70,6 +75,32 @@ private void update() {
             player1.moveRight();
             player2.moveLeft();
         }
+    }
+
+    // Player 1 ataque
+    if (input.isPressed(KeyCode.F)) {
+        if (player1.isNear(player2)) {
+            player2.damage(1);
+            System.out.println("Player 2 vida: " + player2.getHealth());
+        }
+    }
+
+    // Player 2 ataque
+    if (input.isPressed(KeyCode.K)) {
+        if (player2.isNear(player1)) {
+            player1.damage(1);
+            System.out.println("Player 1 vida: " + player1.getHealth());
+        }
+    }
+
+    if (player1.isDead()) {
+        System.out.println("PLAYER 2 GANA");
+        gameOver = true;
+    }
+
+    if (player2.isDead()) {
+        System.out.println("PLAYER 1 GANA");
+        gameOver = true;
     }
 }
 }

@@ -32,9 +32,25 @@ public class Player {
 
     public void damage(int amount) {
         health -= amount;
+
+        if (health < 0) {
+            health = 0;
+        }
+    }
+
+    public boolean isDead() {
+        return health <= 0;
     }
 
     public int getHealth() {
         return health;
+    }
+
+    public boolean isNear(Player other) {
+        double distance = Math.abs(
+            this.body.getTranslateX() - other.body.getTranslateX()
+        );
+
+        return distance < 80;
     }
 }
