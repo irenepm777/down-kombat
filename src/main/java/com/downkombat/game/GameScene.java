@@ -29,7 +29,7 @@ public class GameScene {
                 player2.getBody()
         );
 
-        scene = new Scene(root, 1000, 600);
+        scene = new Scene(root, 1280, 720);
 
         input = new InputHandler(scene);
 
@@ -65,17 +65,33 @@ private void update() {
         player2.moveRight();
     }
 
-    // evitar que los jugadores se atraviesen
-    if (player1.getBody().getBoundsInParent().intersects(player2.getBody().getBoundsInParent())) {
+    // límites de pantalla
+    double minX = 0;
+    double maxX = 1280 - 50; // ancho jugador aprox
 
-        if (player1.getBody().getTranslateX() < player2.getBody().getTranslateX()) {
-            player1.moveLeft();
-            player2.moveRight();
-        } else {
-            player1.moveRight();
-            player2.moveLeft();
-        }
+    // PLAYER 1
+    double p1x = player1.getBody().getTranslateX();
+
+    if (p1x < minX) {
+        player1.getBody().setTranslateX(minX);
     }
+
+    if (p1x > maxX) {
+        player1.getBody().setTranslateX(maxX);
+    }
+
+    // PLAYER 2
+    double p2x = player2.getBody().getTranslateX();
+
+    if (p2x < minX) {
+        player2.getBody().setTranslateX(minX);
+    }
+
+    if (p2x > maxX) {
+        player2.getBody().setTranslateX(maxX);
+    }
+    //QUE MIRE AL SENTIDO AL QUE VA. SI EL OPP MIRA AL MISMO LADO EN PLAN Q LE DAS LA ESPALDA NO LE HACES DAÑO
+
 
     // Player 1 ataque
     if (input.isPressed(KeyCode.F)) {
@@ -104,3 +120,6 @@ private void update() {
     }
 }
 }
+
+
+// Meter cooldown, barra de vida,
