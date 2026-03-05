@@ -19,6 +19,14 @@ public class Player {
     private static final double WIDTH = 125;
     private static final double HEIGHT = 250;
 
+    // NUEVO: cooldown ataque
+    private long lastAttackTime = 0;
+    private static final long ATTACK_COOLDOWN = 350;
+
+    // NUEVO: hitstun
+    private long lastHitTime = 0;
+    private static final long HITSTUN = 300;
+
     public Player(double x, double groundY, Color color) {
 
         node = new Group();
@@ -26,7 +34,6 @@ public class Player {
         sprite = new Rectangle(WIDTH, HEIGHT);
         sprite.setFill(color);
 
-        // centramos el sprite respecto al punto del jugador
         sprite.setTranslateX(-WIDTH / 2);
         sprite.setTranslateY(-HEIGHT);
 
@@ -44,21 +51,29 @@ public class Player {
         return node.getTranslateX();
     }
 
-    public double getY() {
-        return node.getTranslateY();
-    }
-
     public void setX(double x) {
         node.setTranslateX(x);
     }
 
+    public boolean canAttack() {
+
+        long now = System.currentTimeMillis();
+        return now - lastAttackTime >= ATTACK_COOLDOWN;
+    }
+
+    public void registerAttack() {
+        lastAttackTime = System.currentTimeMillis();
+    }
+
     public void moveLeft() {
+
         node.setTranslateX(node.getTranslateX() - speed);
         facingRight = false;
         sprite.setScaleX(-1);
     }
 
     public void moveRight() {
+
         node.setTranslateX(node.getTranslateX() + speed);
         facingRight = true;
         sprite.setScaleX(1);
@@ -83,10 +98,27 @@ public class Player {
 
     public void damage(int amount) {
 
+        long now = System.currentTimeMillis();
+
+        if (now - lastHitTime < HITSTUN) {
+            return;
+        }
+
+        lastHitTime = now;
+
         health -= amount;
 
         if (health < 0) {
             health = 0;
+        }
+    }
+
+    public void applyKnockback(double force) {
+
+        if (facingRight) {
+            node.setTranslateX(node.getTranslateX() + force);
+        } else {
+            node.setTranslateX(node.getTranslateX() - force);
         }
     }
 
@@ -97,5 +129,4 @@ public class Player {
     public int getHealth() {
         return health;
     }
-
 }

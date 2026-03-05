@@ -69,7 +69,6 @@ public class GameScene {
         }
 
         // LIMITES PANTALLA
-
         if (player1.getX() < 60) {
             player1.setX(60);
         }
@@ -88,40 +87,44 @@ public class GameScene {
 
         // ATAQUES
 
+        // Player 1 ataque
         if (input.isPressed(KeyCode.F)) {
 
-            if (player1.isNear(player2) && player1.isFacing(player2)) {
+            if (player1.canAttack() && player1.isNear(player2) && player1.isFacing(player2)) {
 
-                player2.damage(1);
+                player1.registerAttack();
+
+                player2.damage(5);
+                player2.applyKnockback(20);
+
                 System.out.println("Player 2 vida: " + player2.getHealth());
-
             }
         }
 
+        // Player 2 ataque
         if (input.isPressed(KeyCode.K)) {
 
-            if (player2.isNear(player1) && player2.isFacing(player1)) {
+            if (player2.canAttack() && player2.isNear(player1) && player2.isFacing(player1)) {
 
-                player1.damage(1);
+                player2.registerAttack();
+
+                player1.damage(5);
+                player1.applyKnockback(20);
+
                 System.out.println("Player 1 vida: " + player1.getHealth());
-
             }
         }
 
         // FIN COMBATE
 
         if (player1.isDead()) {
-
             System.out.println("PLAYER 2 GANA");
             gameOver = true;
-
         }
 
         if (player2.isDead()) {
-
             System.out.println("PLAYER 1 GANA");
             gameOver = true;
-
         }
     }
 }
