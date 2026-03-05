@@ -1,34 +1,40 @@
 package com.downkombat.game;
 
 import com.downkombat.engine.GameLoop;
+import com.downkombat.input.InputHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import com.downkombat.input.InputHandler;
 import javafx.scene.input.KeyCode;
-
+import javafx.scene.paint.Color;
 
 public class GameScene {
 
-    private boolean gameOver = false;
     private Scene scene;
     private InputHandler input;
 
     private Player player1;
     private Player player2;
 
+    private boolean gameOver = false;
+
+    private static final int WIDTH = 1280;
+    private static final int HEIGHT = 720;
+
+    private static final int GROUND_Y = 650;
+
     public GameScene() {
 
         Group root = new Group();
 
-        player1 = new Player(640 - 200, 720 - 420, Color.RED);
-        player2 = new Player(640 + 200, 720 - 420, Color.BLUE);
+        player1 = new Player(640 - 200, GROUND_Y, Color.RED);
+        player2 = new Player(640 + 200, GROUND_Y, Color.BLUE);
+
         root.getChildren().addAll(
-                player1.getBody(),
-                player2.getBody()
+                player1.getNode(),
+                player2.getNode()
         );
 
-        scene = new Scene(root, 1280, 720);
+        scene = new Scene(root, WIDTH, HEIGHT);
 
         input = new InputHandler(scene);
 
@@ -40,85 +46,82 @@ public class GameScene {
         return scene;
     }
 
-private void update() {
+    private void update() {
 
-    if (gameOver) {
-        return;
-    }
+        if (gameOver) return;
 
-    // Player 1
-    if (input.isPressed(KeyCode.A)) {
-        player1.moveLeft();
-    }
+        // MOVIMIENTO PLAYER 1
+        if (input.isPressed(KeyCode.A)) {
+            player1.moveLeft();
+        }
 
-    if (input.isPressed(KeyCode.D)) {
-        player1.moveRight();
-    }
+        if (input.isPressed(KeyCode.D)) {
+            player1.moveRight();
+        }
 
-    // Player 2
-    if (input.isPressed(KeyCode.LEFT)) {
-        player2.moveLeft();
-    }
+        // MOVIMIENTO PLAYER 2
+        if (input.isPressed(KeyCode.LEFT)) {
+            player2.moveLeft();
+        }
 
-    if (input.isPressed(KeyCode.RIGHT)) {
-        player2.moveRight();
-    }
+        if (input.isPressed(KeyCode.RIGHT)) {
+            player2.moveRight();
+        }
 
-    // límites de pantalla
-    double minX = 0;
-    double maxX = 1280 - 125;
+        // LIMITES PANTALLA
 
-    // PLAYER 1
-    double p1x = player1.getBody().getTranslateX();
+        if (player1.getX() < 60) {
+            player1.setX(60);
+        }
 
-    if (p1x < minX) {
-        player1.getBody().setTranslateX(minX);
-    }
+        if (player1.getX() > WIDTH - 60) {
+            player1.setX(WIDTH - 60);
+        }
 
-    if (p1x > maxX) {
-        player1.getBody().setTranslateX(maxX);
-    }
+        if (player2.getX() < 60) {
+            player2.setX(60);
+        }
 
-    // PLAYER 2
-    double p2x = player2.getBody().getTranslateX();
+        if (player2.getX() > WIDTH - 60) {
+            player2.setX(WIDTH - 60);
+        }
 
-    if (p2x < minX) {
-        player2.getBody().setTranslateX(minX);
-    }
+        // ATAQUES
 
-    if (p2x > maxX) {
-        player2.getBody().setTranslateX(maxX);
-    }
-    //QUE MIRE AL SENTIDO AL QUE VA. SI EL OPP MIRA AL MISMO LADO EN PLAN Q LE DAS LA ESPALDA NO LE HACES DAÑO
+        if (input.isPressed(KeyCode.F)) {
 
+            if (player1.isNear(player2) && player1.isFacing(player2)) {
 
-    // Player 1 ataque
-    if (input.isPressed(KeyCode.F)) {
-        if (player1.isNear(player2)) {
-            player2.damage(1);
-            System.out.println("Player 2 vida: " + player2.getHealth());
+                player2.damage(1);
+                System.out.println("Player 2 vida: " + player2.getHealth());
+
+            }
+        }
+
+        if (input.isPressed(KeyCode.K)) {
+
+            if (player2.isNear(player1) && player2.isFacing(player1)) {
+
+                player1.damage(1);
+                System.out.println("Player 1 vida: " + player1.getHealth());
+
+            }
+        }
+
+        // FIN COMBATE
+
+        if (player1.isDead()) {
+
+            System.out.println("PLAYER 2 GANA");
+            gameOver = true;
+
+        }
+
+        if (player2.isDead()) {
+
+            System.out.println("PLAYER 1 GANA");
+            gameOver = true;
+
         }
     }
-
-    // Player 2 ataque
-    if (input.isPressed(KeyCode.K)) {
-        if (player2.isNear(player1)) {
-            player1.damage(1);
-            System.out.println("Player 1 vida: " + player1.getHealth());
-        }
-    }
-
-    if (player1.isDead()) {
-        System.out.println("PLAYER 2 GANA");
-        gameOver = true;
-    }
-
-    if (player2.isDead()) {
-        System.out.println("PLAYER 1 GANA");
-        gameOver = true;
-    }
 }
-}
-
-
-// Meter cooldown, barra de vida,

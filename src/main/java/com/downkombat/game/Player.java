@@ -1,37 +1,88 @@
 package com.downkombat.game;
 
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class Player {
 
-    private Rectangle body;
+    private Group node;
+    private Rectangle sprite;
+
     private double speed = 5;
+
     private int health = 100;
     private int attackRange = 180;
 
-    public Player(double x, double y, Color color) {
+    private boolean facingRight = true;
 
-        body = new Rectangle(125, 400);
-        body.setFill(color);
+    private static final double WIDTH = 125;
+    private static final double HEIGHT = 250;
 
-        body.setTranslateX(x);
-        body.setTranslateY(720 - 420);
+    public Player(double x, double groundY, Color color) {
+
+        node = new Group();
+
+        sprite = new Rectangle(WIDTH, HEIGHT);
+        sprite.setFill(color);
+
+        // centramos el sprite respecto al punto del jugador
+        sprite.setTranslateX(-WIDTH / 2);
+        sprite.setTranslateY(-HEIGHT);
+
+        node.getChildren().add(sprite);
+
+        node.setTranslateX(x);
+        node.setTranslateY(groundY);
     }
 
-    public Rectangle getBody() {
-        return body;
+    public Group getNode() {
+        return node;
+    }
+
+    public double getX() {
+        return node.getTranslateX();
+    }
+
+    public double getY() {
+        return node.getTranslateY();
+    }
+
+    public void setX(double x) {
+        node.setTranslateX(x);
     }
 
     public void moveLeft() {
-        body.setTranslateX(body.getTranslateX() - speed);
+        node.setTranslateX(node.getTranslateX() - speed);
+        facingRight = false;
+        sprite.setScaleX(-1);
     }
 
     public void moveRight() {
-        body.setTranslateX(body.getTranslateX() + speed);
+        node.setTranslateX(node.getTranslateX() + speed);
+        facingRight = true;
+        sprite.setScaleX(1);
+    }
+
+    public boolean isFacing(Player other) {
+
+        double otherX = other.getX();
+
+        if (otherX > getX()) {
+            return facingRight;
+        } else {
+            return !facingRight;
+        }
+    }
+
+    public boolean isNear(Player other) {
+
+        double distance = Math.abs(getX() - other.getX());
+        return distance < attackRange;
     }
 
     public void damage(int amount) {
+
         health -= amount;
 
         if (health < 0) {
@@ -47,12 +98,4 @@ public class Player {
         return health;
     }
 
-    public boolean isNear(Player other) {
-
-        double distance = Math.abs(
-            this.body.getTranslateX() - other.body.getTranslateX()
-        );
-
-        return distance < attackRange;
-    }
 }
