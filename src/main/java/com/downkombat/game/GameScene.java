@@ -95,7 +95,7 @@ public class GameScene {
                 player1.registerAttack();
 
                 player2.damage(5);
-                player2.applyKnockback(20);
+                player2.applyKnockback(player1, 20);
 
                 System.out.println("Player 2 vida: " + player2.getHealth());
             }
@@ -109,7 +109,7 @@ public class GameScene {
                 player2.registerAttack();
 
                 player1.damage(5);
-                player1.applyKnockback(20);
+                player1.applyKnockback(player2, 20);
 
                 System.out.println("Player 1 vida: " + player1.getHealth());
             }

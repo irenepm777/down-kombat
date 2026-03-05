@@ -19,11 +19,11 @@ public class Player {
     private static final double WIDTH = 125;
     private static final double HEIGHT = 250;
 
-    // NUEVO: cooldown ataque
+    // cooldown ataque
     private long lastAttackTime = 0;
     private static final long ATTACK_COOLDOWN = 350;
 
-    // NUEVO: hitstun
+    // hitstun
     private long lastHitTime = 0;
     private static final long HITSTUN = 300;
 
@@ -34,6 +34,7 @@ public class Player {
         sprite = new Rectangle(WIDTH, HEIGHT);
         sprite.setFill(color);
 
+        // centramos sprite respecto al punto del jugador
         sprite.setTranslateX(-WIDTH / 2);
         sprite.setTranslateY(-HEIGHT);
 
@@ -113,9 +114,10 @@ public class Player {
         }
     }
 
-    public void applyKnockback(double force) {
+    // knockback correcto según posición del atacante
+    public void applyKnockback(Player attacker, double force) {
 
-        if (facingRight) {
+        if (attacker.getX() < this.getX()) {
             node.setTranslateX(node.getTranslateX() + force);
         } else {
             node.setTranslateX(node.getTranslateX() - force);
