@@ -6,6 +6,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
+import com.downkombat.ui.HealthBar;
 
 public class GameScene {
 
@@ -14,6 +15,10 @@ public class GameScene {
 
     private Player player1;
     private Player player2;
+
+
+    private HealthBar healthBarP1;
+    private HealthBar healthBarP2;
 
     private boolean gameOver = false;
 
@@ -28,6 +33,14 @@ public class GameScene {
 
         player1 = new Player(640 - 200, GROUND_Y, Color.RED);
         player2 = new Player(640 + 200, GROUND_Y, Color.BLUE);
+
+        healthBarP1 = new HealthBar(40, 40, Color.RED);
+        healthBarP2 = new HealthBar(840, 40, Color.BLUE);
+
+        root.getChildren().addAll(
+                healthBarP1.getNode(),
+                healthBarP2.getNode()
+        );
 
         root.getChildren().addAll(
                 player1.getNode(),
@@ -126,5 +139,9 @@ public class GameScene {
             System.out.println("PLAYER 1 GANA");
             gameOver = true;
         }
+
+        healthBarP1.update(player1.getHealth());
+        healthBarP2.update(player2.getHealth());
+
     }
 }
