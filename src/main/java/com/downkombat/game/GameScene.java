@@ -21,9 +21,8 @@ public class GameScene {
 
         Group root = new Group();
 
-        player1 = new Player(200, 400, Color.RED);
-        player2 = new Player(700, 400, Color.BLUE);
-
+        player1 = new Player(640 - 200, 720 - 420, Color.RED);
+        player2 = new Player(640 + 200, 720 - 420, Color.BLUE);
         root.getChildren().addAll(
                 player1.getBody(),
                 player2.getBody()
@@ -67,7 +66,7 @@ private void update() {
 
     // límites de pantalla
     double minX = 0;
-    double maxX = 1280 - 50; // ancho jugador aprox
+    double maxX = 1280 - 125;
 
     // PLAYER 1
     double p1x = player1.getBody().getTranslateX();

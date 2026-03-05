@@ -8,14 +8,15 @@ public class Player {
     private Rectangle body;
     private double speed = 5;
     private int health = 100;
+    private int attackRange = 180;
 
     public Player(double x, double y, Color color) {
 
-        body = new Rectangle(50, 80);
+        body = new Rectangle(125, 400);
         body.setFill(color);
 
         body.setTranslateX(x);
-        body.setTranslateY(y);
+        body.setTranslateY(720 - 420);
     }
 
     public Rectangle getBody() {
@@ -47,10 +48,11 @@ public class Player {
     }
 
     public boolean isNear(Player other) {
+
         double distance = Math.abs(
             this.body.getTranslateX() - other.body.getTranslateX()
         );
 
-        return distance < 80;
+        return distance < attackRange;
     }
 }
