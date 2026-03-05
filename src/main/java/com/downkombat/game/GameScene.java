@@ -2,11 +2,11 @@ package com.downkombat.game;
 
 import com.downkombat.engine.GameLoop;
 import com.downkombat.input.InputHandler;
+import com.downkombat.ui.HealthBar;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
-import com.downkombat.ui.HealthBar;
 
 public class GameScene {
 
@@ -16,11 +16,10 @@ public class GameScene {
     private Player player1;
     private Player player2;
 
-
     private HealthBar healthBarP1;
     private HealthBar healthBarP2;
 
-    private boolean gameOver = false;
+    private GameState gameState = GameState.FIGHT;
 
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
@@ -38,13 +37,10 @@ public class GameScene {
         healthBarP2 = new HealthBar(840, 40, Color.BLUE);
 
         root.getChildren().addAll(
+                player1.getNode(),
+                player2.getNode(),
                 healthBarP1.getNode(),
                 healthBarP2.getNode()
-        );
-
-        root.getChildren().addAll(
-                player1.getNode(),
-                player2.getNode()
         );
 
         scene = new Scene(root, WIDTH, HEIGHT);
@@ -61,7 +57,9 @@ public class GameScene {
 
     private void update() {
 
-        if (gameOver) return;
+        if (gameState != GameState.FIGHT) {
+            return;
+        }
 
         // MOVIMIENTO PLAYER 1
         if (input.isPressed(KeyCode.A)) {
@@ -82,6 +80,7 @@ public class GameScene {
         }
 
         // LIMITES PANTALLA
+
         if (player1.getX() < 60) {
             player1.setX(60);
         }
@@ -100,7 +99,6 @@ public class GameScene {
 
         // ATAQUES
 
-        // Player 1 ataque
         if (input.isPressed(KeyCode.F)) {
 
             if (player1.canAttack() && player1.isNear(player2) && player1.isFacing(player2)) {
@@ -114,7 +112,6 @@ public class GameScene {
             }
         }
 
-        // Player 2 ataque
         if (input.isPressed(KeyCode.K)) {
 
             if (player2.canAttack() && player2.isNear(player1) && player2.isFacing(player1)) {
@@ -128,20 +125,25 @@ public class GameScene {
             }
         }
 
-        // FIN COMBATE
-
-        if (player1.isDead()) {
-            System.out.println("PLAYER 2 GANA");
-            gameOver = true;
-        }
-
-        if (player2.isDead()) {
-            System.out.println("PLAYER 1 GANA");
-            gameOver = true;
-        }
+        // UPDATE UI
 
         healthBarP1.update(player1.getHealth());
         healthBarP2.update(player2.getHealth());
 
+        // FIN COMBATE
+
+        if (player1.isDead()) {
+
+            System.out.println("PLAYER 2 GANA");
+            gameState = GameState.GAME_OVER;
+
+        }
+
+        if (player2.isDead()) {
+
+            System.out.println("PLAYER 1 GANA");
+            gameState = GameState.GAME_OVER;
+
+        }
     }
 }
