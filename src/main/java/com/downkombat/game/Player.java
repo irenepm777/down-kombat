@@ -1,5 +1,6 @@
 package com.downkombat.game;
 
+import com.downkombat.config.GameConfig;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -9,10 +10,10 @@ public class Player {
     private Group node;
     private Rectangle sprite;
 
-    private double speed = 5;
+    private double speed = GameConfig.PLAYER_SPEED;
 
-    private int health = 100;
-    private int attackRange = 180;
+    private int health = GameConfig.PLAYER_MAX_HEALTH;
+    private int attackRange = GameConfig.ATTACK_RANGE;
 
     private boolean facingRight = true;
 
@@ -21,15 +22,15 @@ public class Player {
 
     private Color originalColor;
     private long flashEndTime = 0;
-    private static final int FLASH_DURATION = 120;
+    private static final int FLASH_DURATION = GameConfig.DAMAGE_FLASH;
 
     // cooldown ataque
     private long lastAttackTime = 0;
-    private static final long ATTACK_COOLDOWN = 350;
+    private static final long ATTACK_COOLDOWN = GameConfig.ATTACK_COOLDOWN;
 
     // hitstun
     private long lastHitTime = 0;
-    private static final long HITSTUN = 300;
+    private static final long HITSTUN = GameConfig.HITSTUN;
 
     public Player(double x, double groundY, Color color) {
 
@@ -39,7 +40,6 @@ public class Player {
         sprite.setFill(color);
         originalColor = color;
 
-        // centramos sprite respecto al punto del jugador
         sprite.setTranslateX(-WIDTH / 2);
         sprite.setTranslateY(-HEIGHT);
 
@@ -118,12 +118,11 @@ public class Player {
             health = 0;
         }
 
-        // activar flash blanco
+        // flash de daño
         sprite.setFill(Color.WHITE);
         flashEndTime = now + FLASH_DURATION;
     }
 
-    // knockback correcto según posición del atacante
     public void applyKnockback(Player attacker, double force) {
 
         if (attacker.getX() < this.getX()) {
