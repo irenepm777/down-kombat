@@ -19,6 +19,10 @@ public class Player {
     private static final double WIDTH = 125;
     private static final double HEIGHT = 250;
 
+    private Color originalColor;
+    private long flashEndTime = 0;
+    private static final int FLASH_DURATION = 120;
+
     // cooldown ataque
     private long lastAttackTime = 0;
     private static final long ATTACK_COOLDOWN = 350;
@@ -33,6 +37,7 @@ public class Player {
 
         sprite = new Rectangle(WIDTH, HEIGHT);
         sprite.setFill(color);
+        originalColor = color;
 
         // centramos sprite respecto al punto del jugador
         sprite.setTranslateX(-WIDTH / 2);
@@ -112,6 +117,10 @@ public class Player {
         if (health < 0) {
             health = 0;
         }
+
+        // activar flash blanco
+        sprite.setFill(Color.WHITE);
+        flashEndTime = now + FLASH_DURATION;
     }
 
     // knockback correcto según posición del atacante
@@ -121,6 +130,16 @@ public class Player {
             node.setTranslateX(node.getTranslateX() + force);
         } else {
             node.setTranslateX(node.getTranslateX() - force);
+        }
+    }
+
+    public void update() {
+
+        long now = System.currentTimeMillis();
+
+        if (flashEndTime > 0 && now > flashEndTime) {
+            sprite.setFill(originalColor);
+            flashEndTime = 0;
         }
     }
 

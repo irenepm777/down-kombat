@@ -81,6 +81,9 @@ public class GameScene {
 
     private void update() {
 
+	player1.update();
+	player2.update();
+
         long now = System.currentTimeMillis();
         if (now < freezeEndTime) {
             return;
