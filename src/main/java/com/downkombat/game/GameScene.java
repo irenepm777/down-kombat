@@ -40,7 +40,7 @@ public class GameScene {
 
         winText = new Text();
         winText.setFont(new Font(60));
-        winText.setFill(Color.WHITE);
+        winText.setFill(Color.BLACK);
         winText.setX(400);
         winText.setY(360);
         winText.setVisible(false);
@@ -117,8 +117,7 @@ public class GameScene {
 
                 player1.registerAttack();
 
-                player2.damage(GameConfig.ATTACK_DAMAGE);
-                player2.applyKnockback(player1, GameConfig.KNOCKBACK_FORCE);
+                player1.performAttack(player2);
 
                 freezeEndTime = System.currentTimeMillis() + GameConfig.HIT_FREEZE;
 
@@ -133,8 +132,7 @@ public class GameScene {
 
                 player2.registerAttack();
 
-                player1.damage(GameConfig.ATTACK_DAMAGE);
-                player1.applyKnockback(player2, GameConfig.KNOCKBACK_FORCE);
+                player2.performAttack(player1);
 
                 freezeEndTime = System.currentTimeMillis() + GameConfig.HIT_FREEZE;
 

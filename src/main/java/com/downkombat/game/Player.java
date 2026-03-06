@@ -1,5 +1,7 @@
 package com.downkombat.game;
 
+import com.downkombat.combat.SpecialAttack;
+import com.downkombat.combat.DefaultPunch;
 import com.downkombat.config.GameConfig;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -23,6 +25,8 @@ public class Player {
     private Color originalColor;
     private long flashEndTime = 0;
     private static final int FLASH_DURATION = GameConfig.DAMAGE_FLASH;
+
+    private SpecialAttack attack = new DefaultPunch();
 
     // cooldown ataque
     private long lastAttackTime = 0;
@@ -100,6 +104,10 @@ public class Player {
 
         double distance = Math.abs(getX() - other.getX());
         return distance < attackRange;
+    }
+
+    public void performAttack(Player enemy) {
+        attack.execute(this, enemy);
     }
 
     public void damage(int amount) {
