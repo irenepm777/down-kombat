@@ -1,13 +1,12 @@
-package com.downkombat.game;
+package com.downkombat.fighters;
 
 import com.downkombat.combat.SpecialAttack;
-import com.downkombat.combat.DefaultPunch;
 import com.downkombat.config.GameConfig;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-public class Player {
+public class Fighter {
 
     private Group node;
     private Rectangle sprite;
@@ -15,34 +14,32 @@ public class Player {
     private double speed = GameConfig.PLAYER_SPEED;
 
     private int health = GameConfig.PLAYER_MAX_HEALTH;
-    private int attackRange = GameConfig.ATTACK_RANGE;
 
     private boolean facingRight = true;
+
+    private SpecialAttack normalAttack;
+    private SpecialAttack specialAttack;
+
+    private long lastAttackTime = 0;
+    private long lastSpecialTime = 0;
+
+    private Color originalColor;
+    private long flashEndTime = 0;
 
     private static final double WIDTH = 125;
     private static final double HEIGHT = 250;
 
-    private Color originalColor;
-    private long flashEndTime = 0;
-    private static final int FLASH_DURATION = GameConfig.DAMAGE_FLASH;
+    public Fighter(double x, double groundY, Color color,
+                   SpecialAttack normalAttack,
+                   SpecialAttack specialAttack) {
 
-    private SpecialAttack attack = new DefaultPunch();
-
-    // cooldown ataque
-    private long lastAttackTime = 0;
-    private static final long ATTACK_COOLDOWN = GameConfig.ATTACK_COOLDOWN;
-
-    // hitstun
-    private long lastHitTime = 0;
-    private static final long HITSTUN = GameConfig.HITSTUN;
-
-    public Player(double x, double groundY, Color color) {
+        this.normalAttack = normalAttack;
+        this.specialAttack = specialAttack;
 
         node = new Group();
 
         sprite = new Rectangle(WIDTH, HEIGHT);
         sprite.setFill(color);
-        originalColor = color;
 
         sprite.setTranslateX(-WIDTH / 2);
         sprite.setTranslateY(-HEIGHT);
@@ -51,6 +48,8 @@ public class Player {
 
         node.setTranslateX(x);
         node.setTranslateY(groundY);
+
+        originalColor = color;
     }
 
     public Group getNode() {
@@ -65,19 +64,18 @@ public class Player {
         node.setTranslateX(x);
     }
 
-    public boolean canAttack() {
-
-        long now = System.currentTimeMillis();
-        return now - lastAttackTime >= ATTACK_COOLDOWN;
+    public int getHealth() {
+        return health;
     }
 
-    public void registerAttack() {
-        lastAttackTime = System.currentTimeMillis();
+    public boolean isDead() {
+        return health <= 0;
     }
 
     public void moveLeft() {
 
         node.setTranslateX(node.getTranslateX() - speed);
+
         facingRight = false;
         sprite.setScaleX(-1);
     }
@@ -85,11 +83,12 @@ public class Player {
     public void moveRight() {
 
         node.setTranslateX(node.getTranslateX() + speed);
+
         facingRight = true;
         sprite.setScaleX(1);
     }
 
-    public boolean isFacing(Player other) {
+    public boolean isFacing(Fighter other) {
 
         double otherX = other.getX();
 
@@ -100,25 +99,42 @@ public class Player {
         }
     }
 
-    public boolean isNear(Player other) {
+    public boolean isNear(Fighter other) {
 
         double distance = Math.abs(getX() - other.getX());
-        return distance < attackRange;
+
+        return distance < GameConfig.ATTACK_RANGE;
     }
 
-    public void performAttack(Player enemy) {
-        attack.execute(this, enemy);
-    }
-
-    public void damage(int amount) {
+    public boolean canAttack() {
 
         long now = System.currentTimeMillis();
 
-        if (now - lastHitTime < HITSTUN) {
-            return;
-        }
+        return now - lastAttackTime >= GameConfig.ATTACK_COOLDOWN;
+    }
 
-        lastHitTime = now;
+    public boolean canSpecial() {
+
+        long now = System.currentTimeMillis();
+
+        return now - lastSpecialTime >= GameConfig.SPECIAL_COOLDOWN;
+    }
+
+    public void performAttack(Fighter enemy) {
+
+        lastAttackTime = System.currentTimeMillis();
+
+        normalAttack.execute(this, enemy);
+    }
+
+    public void performSpecial(Fighter enemy) {
+
+        lastSpecialTime = System.currentTimeMillis();
+
+        specialAttack.execute(this, enemy);
+    }
+
+    public void damage(int amount) {
 
         health -= amount;
 
@@ -126,22 +142,21 @@ public class Player {
             health = 0;
         }
 
-        // flash de daño
         sprite.setFill(Color.WHITE);
-        flashEndTime = now + FLASH_DURATION;
+
+        flashEndTime = System.currentTimeMillis() + GameConfig.DAMAGE_FLASH;
     }
 
-    public void applyKnockback(Player attacker, double force) {
+    public void applyKnockback(Fighter attacker, double force) {
 
         if (attacker.getX() < this.getX()) {
+
             node.setTranslateX(node.getTranslateX() + force);
+
         } else {
+
             node.setTranslateX(node.getTranslateX() - force);
         }
-    }
-
-    public void setAttack(SpecialAttack attack) {
-        this.attack = attack;
     }
 
     public void update() {
@@ -149,16 +164,10 @@ public class Player {
         long now = System.currentTimeMillis();
 
         if (flashEndTime > 0 && now > flashEndTime) {
+
             sprite.setFill(originalColor);
+
             flashEndTime = 0;
         }
-    }
-
-    public boolean isDead() {
-        return health <= 0;
-    }
-
-    public int getHealth() {
-        return health;
     }
 }

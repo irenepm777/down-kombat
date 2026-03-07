@@ -4,7 +4,7 @@ import com.downkombat.combat.SpecialAttack;
 import com.downkombat.config.GameConfig;
 import com.downkombat.fighters.Fighter;
 
-public class AntonioAttack implements SpecialAttack {
+public class AntonioSpecial implements SpecialAttack {
 
     private boolean transformed = false;
     private long transformEndTime = 0;

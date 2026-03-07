@@ -2,6 +2,9 @@ package com.downkombat.game;
 
 import com.downkombat.config.GameConfig;
 import com.downkombat.engine.GameLoop;
+import com.downkombat.fighters.CharacterType;
+import com.downkombat.fighters.Fighter;
+import com.downkombat.fighters.FighterFactory;
 import com.downkombat.input.InputHandler;
 import com.downkombat.ui.HealthBar;
 import javafx.scene.Group;
@@ -17,8 +20,10 @@ public class GameScene {
     private Group root;
     private InputHandler input;
 
-    private Player player1;
-    private Player player2;
+    private Fighter fighter1;
+    private Fighter fighter2;
+
+    private FightManager fightManager;
 
     private HealthBar healthBarP1;
     private HealthBar healthBarP2;
@@ -33,7 +38,9 @@ public class GameScene {
 
         root = new Group();
 
-        spawnPlayers();
+        spawnFighters();
+
+        fightManager = new FightManager(fighter1, fighter2);
 
         healthBarP1 = new HealthBar(40, 40, Color.RED);
         healthBarP2 = new HealthBar(840, 40, Color.BLUE);
@@ -63,14 +70,14 @@ public class GameScene {
         return scene;
     }
 
-    private void spawnPlayers() {
+    private void spawnFighters() {
 
-        player1 = new Player(640 - 200, GameConfig.GROUND_Y, Color.RED);
-        player2 = new Player(640 + 200, GameConfig.GROUND_Y, Color.BLUE);
+        fighter1 = FighterFactory.create(CharacterType.ANTONIO, 640 - 200);
+        fighter2 = FighterFactory.create(CharacterType.SORAYA, 640 + 200);
 
         root.getChildren().addAll(
-                player1.getNode(),
-                player2.getNode()
+                fighter1.getNode(),
+                fighter2.getNode()
         );
     }
 
@@ -92,82 +99,96 @@ public class GameScene {
         }
 
         // MOVIMIENTO PLAYER 1
-        if (input.isPressed(KeyCode.A)) player1.moveLeft();
-        if (input.isPressed(KeyCode.D)) player1.moveRight();
+        if (input.isPressed(KeyCode.A)) fighter1.moveLeft();
+        if (input.isPressed(KeyCode.D)) fighter1.moveRight();
 
         // MOVIMIENTO PLAYER 2
-        if (input.isPressed(KeyCode.LEFT)) player2.moveLeft();
-        if (input.isPressed(KeyCode.RIGHT)) player2.moveRight();
+        if (input.isPressed(KeyCode.LEFT)) fighter2.moveLeft();
+        if (input.isPressed(KeyCode.RIGHT)) fighter2.moveRight();
 
-        // LIMITES PANTALLA
-        if (player1.getX() < 60) player1.setX(60);
-        if (player1.getX() > GameConfig.WIDTH - 60) player1.setX(GameConfig.WIDTH - 60);
+        // LIMITES DE PANTALLA
 
-        if (player2.getX() < 60) player2.setX(60);
-        if (player2.getX() > GameConfig.WIDTH - 60) player2.setX(GameConfig.WIDTH - 60);
+        if (fighter1.getX() < 60) fighter1.setX(60);
+        if (fighter1.getX() > GameConfig.WIDTH - 60) fighter1.setX(GameConfig.WIDTH - 60);
 
-        // UPDATE PLAYER EFFECTS
-        player1.update();
-        player2.update();
+        if (fighter2.getX() < 60) fighter2.setX(60);
+        if (fighter2.getX() > GameConfig.WIDTH - 60) fighter2.setX(GameConfig.WIDTH - 60);
 
-        // ATAQUE PLAYER 1
+        // UPDATE EFECTOS VISUALES
+
+        fighter1.update();
+        fighter2.update();
+
+        // ATAQUES NORMALES
+
         if (input.isPressed(KeyCode.F)) {
 
-            if (player1.canAttack() && player1.isNear(player2) && player1.isFacing(player2)) {
-
-                player1.registerAttack();
-
-                player1.performAttack(player2);
+            if (fightManager.tryAttack(fighter1, fighter2)) {
 
                 freezeEndTime = System.currentTimeMillis() + GameConfig.HIT_FREEZE;
 
-                System.out.println("Player 2 vida: " + player2.getHealth());
+                System.out.println("Player 2 vida: " + fighter2.getHealth());
             }
         }
 
-        // ATAQUE PLAYER 2
         if (input.isPressed(KeyCode.K)) {
 
-            if (player2.canAttack() && player2.isNear(player1) && player2.isFacing(player1)) {
-
-                player2.registerAttack();
-
-                player2.performAttack(player1);
+            if (fightManager.tryAttack(fighter2, fighter1)) {
 
                 freezeEndTime = System.currentTimeMillis() + GameConfig.HIT_FREEZE;
 
-                System.out.println("Player 1 vida: " + player1.getHealth());
+                System.out.println("Player 1 vida: " + fighter1.getHealth());
+            }
+        }
+
+        // ATAQUES ESPECIALES
+
+        if (input.isPressed(KeyCode.G)) {
+
+            if (fightManager.trySpecial(fighter1, fighter2)) {
+
+                freezeEndTime = System.currentTimeMillis() + GameConfig.HIT_FREEZE;
+            }
+        }
+
+        if (input.isPressed(KeyCode.L)) {
+
+            if (fightManager.trySpecial(fighter2, fighter1)) {
+
+                freezeEndTime = System.currentTimeMillis() + GameConfig.HIT_FREEZE;
             }
         }
 
         // UI
-        healthBarP1.update(player1.getHealth());
-        healthBarP2.update(player2.getHealth());
 
-        // FIN COMBATE
-        if (player1.isDead()) {
+        healthBarP1.update(fighter1.getHealth());
+        healthBarP2.update(fighter2.getHealth());
+
+        // FIN DEL COMBATE
+
+        if (fighter1.isDead()) {
 
             winText.setText("PLAYER 2 WINS\nPress R to restart");
             winText.setVisible(true);
             gameState = GameState.GAME_OVER;
-
         }
 
-        if (player2.isDead()) {
+        if (fighter2.isDead()) {
 
             winText.setText("PLAYER 1 WINS\nPress R to restart");
             winText.setVisible(true);
             gameState = GameState.GAME_OVER;
-
         }
     }
 
     private void resetFight() {
 
-        root.getChildren().remove(player1.getNode());
-        root.getChildren().remove(player2.getNode());
+        root.getChildren().remove(fighter1.getNode());
+        root.getChildren().remove(fighter2.getNode());
 
-        spawnPlayers();
+        spawnFighters();
+
+        fightManager = new FightManager(fighter1, fighter2);
 
         healthBarP1.update(GameConfig.PLAYER_MAX_HEALTH);
         healthBarP2.update(GameConfig.PLAYER_MAX_HEALTH);
