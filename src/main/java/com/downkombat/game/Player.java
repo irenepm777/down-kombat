@@ -140,6 +140,10 @@ public class Player {
         }
     }
 
+    public void setAttack(SpecialAttack attack) {
+        this.attack = attack;
+    }
+
     public void update() {
 
         long now = System.currentTimeMillis();
