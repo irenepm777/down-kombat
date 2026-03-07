@@ -1,6 +1,11 @@
-com/downkombat/game/GameScene.class
+com/downkombat/config/GameConfig.class
+com/downkombat/combat/SpecialAttack.class
 com/downkombat/input/InputHandler.class
 com/downkombat/game/Player.class
+com/downkombat/combat/AntonioAttack.class
+com/downkombat/game/GameState.class
+com/downkombat/game/GameScene.class
 com/downkombat/engine/GameLoop.class
 com/downkombat/Main.class
 com/downkombat/ui/HealthBar.class
+com/downkombat/combat/DefaultPunch.class

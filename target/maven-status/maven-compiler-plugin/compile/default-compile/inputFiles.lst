@@ -1,6 +1,11 @@
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/game/GameScene.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/game/GameState.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/ui/HealthBar.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/SpecialAttack.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/game/Player.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/AntonioAttack.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/Main.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/input/InputHandler.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/DefaultPunch.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/config/GameConfig.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/engine/GameLoop.java
