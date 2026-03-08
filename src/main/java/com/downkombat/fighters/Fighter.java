@@ -24,6 +24,8 @@ public class Fighter {
     private long lastSpecialTime = 0;
 
     private Color originalColor;
+    private Color currentColor;
+
     private long flashEndTime = 0;
 
     private static final double WIDTH = 125;
@@ -50,6 +52,7 @@ public class Fighter {
         node.setTranslateY(groundY);
 
         originalColor = color;
+        currentColor = color;
     }
 
     public Group getNode() {
@@ -137,9 +140,8 @@ public class Fighter {
     public void damage(int amount) {
 
         if (health <= GameConfig.PLAYER_MAX_HEALTH * GameConfig.CRITICAL_HEALTH_THRESHOLD) {
-            amount = (int)(amount * 1.5); // golpes más fuertes
+            amount = (int)(amount * 1.5);
         }
-
 
         health -= amount;
 
@@ -164,15 +166,30 @@ public class Fighter {
         }
     }
 
+    public void setColor(Color color) {
+
+        currentColor = color;
+        sprite.setFill(color);
+    }
+
+    public Color getColor() {
+
+        return currentColor;
+    }
+
     public void update() {
 
         long now = System.currentTimeMillis();
 
         if (flashEndTime > 0 && now > flashEndTime) {
 
-            sprite.setFill(originalColor);
+            sprite.setFill(currentColor);
 
             flashEndTime = 0;
+        }
+
+        if (specialAttack != null) {
+            specialAttack.update(this);
         }
     }
 }

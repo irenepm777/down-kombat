@@ -3,12 +3,11 @@
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/SpecialAttack.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/input/InputHandler.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/DefaultPunch.java
-/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/attacks/AntonioAttack.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/attacks/TransformationAttack.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/config/GameConfig.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/engine/GameLoop.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/fighters/Fighter.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/Attack.java
-/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/attacks/AntonioSpecial.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/fighters/FighterFactory.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/game/GameScene.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/fighters/CharacterType.java

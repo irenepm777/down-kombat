@@ -1,3 +1,4 @@
+com/downkombat/combat/attacks/TransformationAttack.class
 com/downkombat/input/InputHandler.class
 com/downkombat/game/FightManager.class
 com/downkombat/fighters/Fighter.class
@@ -9,8 +10,6 @@ com/downkombat/Main.class
 com/downkombat/ui/HealthBar.class
 com/downkombat/config/GameConfig.class
 com/downkombat/combat/SpecialAttack.class
-com/downkombat/combat/attacks/AntonioAttack.class
-com/downkombat/combat/attacks/AntonioSpecial.class
 com/downkombat/game/GameState.class
 com/downkombat/fighters/FighterFactory.class
 com/downkombat/fighters/CharacterType.class

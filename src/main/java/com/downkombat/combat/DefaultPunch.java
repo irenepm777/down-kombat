@@ -10,6 +10,10 @@ public class DefaultPunch implements SpecialAttack {
 
         defender.damage(GameConfig.ATTACK_DAMAGE);
         defender.applyKnockback(attacker, GameConfig.KNOCKBACK_FORCE);
+    }
 
+    @Override
+    public void update(Fighter attacker) {
+        // no tiene estado temporal
     }
 }

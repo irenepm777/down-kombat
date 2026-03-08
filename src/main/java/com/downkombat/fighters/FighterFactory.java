@@ -1,7 +1,7 @@
 package com.downkombat.fighters;
 
 import com.downkombat.combat.DefaultPunch;
-import com.downkombat.combat.attacks.AntonioAttack;
+import com.downkombat.combat.attacks.TransformationAttack;
 import com.downkombat.config.GameConfig;
 import javafx.scene.paint.Color;
 
@@ -17,7 +17,12 @@ public class FighterFactory {
                         GameConfig.GROUND_Y,
                         Color.RED,
                         new DefaultPunch(),
-                        new AntonioAttack()
+                        new TransformationAttack(
+                                15000,
+                                12,
+                                60,
+                                Color.DARKRED
+                        )
                 );
 
             case SORAYA:
@@ -30,7 +35,9 @@ public class FighterFactory {
                 );
 
             default:
-                throw new IllegalArgumentException("Character not implemented: " + type);
+                throw new IllegalArgumentException(
+                        "Character not implemented: " + type
+                );
         }
     }
 }
