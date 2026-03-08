@@ -1,6 +1,7 @@
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/game/GameState.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/ui/HealthBar.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/SpecialAttack.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/attacks/MolarAttack.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/input/InputHandler.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/DefaultPunch.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/attacks/TransformationAttack.java
@@ -11,5 +12,7 @@
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/fighters/FighterFactory.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/game/GameScene.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/fighters/CharacterType.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/projectiles/Projectile.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/Main.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/projectiles/ProjectileManager.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/game/FightManager.java

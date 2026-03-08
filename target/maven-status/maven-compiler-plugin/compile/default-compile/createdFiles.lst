@@ -6,11 +6,14 @@ com/downkombat/fighters/FighterFactory$1.class
 com/downkombat/game/GameScene.class
 com/downkombat/engine/GameLoop.class
 com/downkombat/combat/Attack.class
+com/downkombat/combat/projectiles/Projectile.class
 com/downkombat/Main.class
 com/downkombat/ui/HealthBar.class
+com/downkombat/combat/attacks/MolarAttack.class
 com/downkombat/config/GameConfig.class
 com/downkombat/combat/SpecialAttack.class
 com/downkombat/game/GameState.class
 com/downkombat/fighters/FighterFactory.class
+com/downkombat/combat/projectiles/ProjectileManager.class
 com/downkombat/fighters/CharacterType.class
 com/downkombat/combat/DefaultPunch.class
