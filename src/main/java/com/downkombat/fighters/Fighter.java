@@ -136,6 +136,11 @@ public class Fighter {
 
     public void damage(int amount) {
 
+        if (health <= GameConfig.PLAYER_MAX_HEALTH * GameConfig.CRITICAL_HEALTH_THRESHOLD) {
+            amount = (int)(amount * 1.5); // golpes más fuertes
+        }
+
+
         health -= amount;
 
         if (health < 0) {
