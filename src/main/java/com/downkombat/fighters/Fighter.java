@@ -64,6 +64,10 @@ public class Fighter {
         currentColor = color;
     }
 
+    public Color getOriginalColor() {
+        return originalColor;
+    }
+
     public Group getNode() {
         return node;
     }

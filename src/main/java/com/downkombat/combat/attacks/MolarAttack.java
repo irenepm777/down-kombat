@@ -4,6 +4,7 @@ import com.downkombat.combat.SpecialAttack;
 import com.downkombat.combat.projectiles.Projectile;
 import com.downkombat.combat.projectiles.ProjectileManager;
 import com.downkombat.fighters.Fighter;
+import javafx.scene.paint.Color;
 
 public class MolarAttack implements SpecialAttack {
 
@@ -25,20 +26,27 @@ public class MolarAttack implements SpecialAttack {
         shotsRemaining = 6;
         nextShotTime = System.currentTimeMillis();
 
-        // guardar dirección hacia el enemigo
+        // guardar dirección real del personaje
         direction = attacker.isFacingRight();
+
+        // animación: Soraya abre la boca
+        attacker.setColor(Color.PINK);
     }
 
     @Override
     public void update(Fighter attacker) {
 
-        if (shotsRemaining <= 0) return;
+        if (shotsRemaining <= 0) {
+            // restaurar color cuando termina la ráfaga
+            attacker.setColor(attacker.getOriginalColor());
+            return;
+        }
 
         long now = System.currentTimeMillis();
 
         if (now >= nextShotTime) {
 
-            // spawn ligeramente delante del personaje
+            // spawn delante del personaje
             double spawnX = attacker.getX();
 
             if (direction) {
