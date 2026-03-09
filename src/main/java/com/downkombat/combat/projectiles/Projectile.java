@@ -15,14 +15,17 @@ public class Projectile {
     private boolean active = true;
 
     private static final double SPEED = 12;
+    private static final double HITBOX = 20; // tamaño de colisión real
 
     public Projectile(double x, double y, boolean movingRight, Fighter owner) {
 
         this.movingRight = movingRight;
         this.owner = owner;
 
-        sprite = new Circle(8);
+        sprite = new Circle(12);
         sprite.setFill(Color.WHITE);
+        sprite.setStroke(Color.BLACK);
+        sprite.setStrokeWidth(2);
 
         sprite.setTranslateX(x);
         sprite.setTranslateY(y);
@@ -40,6 +43,7 @@ public class Projectile {
 
         if (!active) return;
 
+        // mover proyectil
         if (movingRight) {
             sprite.setTranslateX(sprite.getTranslateX() + SPEED);
         } else {
@@ -47,6 +51,11 @@ public class Projectile {
         }
 
         checkCollision(enemy);
+
+        // destruir si sale de la pantalla
+        if (sprite.getTranslateX() < -50 || sprite.getTranslateX() > GameConfig.WIDTH + 50) {
+            active = false;
+        }
     }
 
     private void checkCollision(Fighter enemy) {
@@ -58,9 +67,9 @@ public class Projectile {
 
         double dx = Math.abs(sprite.getTranslateX() - enemy.getX());
 
-        if (dx < GameConfig.ATTACK_RANGE / 3) {
+        if (dx < HITBOX) {
 
-            enemy.damage(6);
+            enemy.damage(GameConfig.MOLAR_SPECIAL_DAMAGE / 6);
             enemy.applyKnockback(owner, GameConfig.KNOCKBACK_FORCE);
 
             active = false;

@@ -26,7 +26,7 @@ public class MolarAttack implements SpecialAttack {
         nextShotTime = System.currentTimeMillis();
 
         // guardar dirección hacia el enemigo
-        direction = attacker.isFacing(defender);
+        direction = attacker.isFacingRight();
     }
 
     @Override

@@ -29,6 +29,9 @@ public class GameConfig {
 
     public static final int ATTACK_DAMAGE = 4;
 
+    // daño total del especial MOLAR-47
+    public static final int MOLAR_SPECIAL_DAMAGE = 12;
+
     public static final int ATTACK_RANGE = 180;
 
     public static final int KNOCKBACK_FORCE = 35;

@@ -51,6 +51,15 @@ public class Fighter {
         node.setTranslateX(x);
         node.setTranslateY(groundY);
 
+        // orientar sprite según posición inicial
+       if (x > GameConfig.WIDTH / 2) {
+           facingRight = false;
+           sprite.setScaleX(-1);
+       } else {
+           facingRight = true;
+           sprite.setScaleX(1);
+       }
+
         originalColor = color;
         currentColor = color;
     }
@@ -175,6 +184,10 @@ public class Fighter {
     public Color getColor() {
 
         return currentColor;
+    }
+
+    public boolean isFacingRight() {
+        return facingRight;
     }
 
     public void update() {
