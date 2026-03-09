@@ -29,6 +29,9 @@ public class GameScene {
     private Fighter player1;
     private Fighter player2;
 
+    private CharacterType p1Type;
+    private CharacterType p2Type;
+
     private HealthBar healthBarP1;
     private HealthBar healthBarP2;
 
@@ -42,7 +45,10 @@ public class GameScene {
     private ProjectileManager projectileManager;
     private CarManager carManager;
 
-    public GameScene() {
+    public GameScene(CharacterType p1Type, CharacterType p2Type) {
+
+        this.p1Type = p1Type;
+        this.p2Type = p2Type;
 
         root = new Group();
 
@@ -90,14 +96,14 @@ public class GameScene {
     private void spawnPlayers() {
 
         player1 = FighterFactory.create(
-                CharacterType.ANTONIO,
+                p1Type,
                 640 - 200,
                 projectileManager,
                 carManager
         );
 
         player2 = FighterFactory.create(
-                CharacterType.SORAYA,
+                p2Type,
                 640 + 200,
                 projectileManager,
                 carManager
@@ -113,9 +119,7 @@ public class GameScene {
 
         long now = System.currentTimeMillis();
 
-        if (now < freezeEndTime) {
-            return;
-        }
+        if (now < freezeEndTime) return;
 
         if (gameState == GameState.GAME_OVER) {
 
