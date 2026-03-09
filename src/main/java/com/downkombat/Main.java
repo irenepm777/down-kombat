@@ -1,7 +1,10 @@
 package com.downkombat;
 
 import com.downkombat.game.GameScene;
+import com.downkombat.menuinicio.MenuInicio;
+
 import javafx.application.Application;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
@@ -9,17 +12,25 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
-    @Override
-    public void start(Stage stage) {
+	@Override
+	public void start(Stage stage) {
 
-        GameScene game = new GameScene();
+	    // Load Google Font BEFORE anything else
+	    Font.loadFont(
+	        "https://fonts.gstatic.com/s/pressstart2p/v11/e3t4euO8T-267oIAQAu6jDQyK3k.woff2",
+	        10
+	    );
 
-        stage.setTitle("DOWN KOMBAT");
-        stage.setScene(game.getScene());
-        stage.show();
-    }
+	    // Start menu directly
+	    startMenu(stage);
+	}
 
-    public static void main(String[] args) {
-        launch();
-    }
+	public void startMenu(Stage stage) {
+	    MenuInicio menu = new MenuInicio();
+	    menu.start(stage);
+	}
+
+	public static void main(String[] args) {
+	    launch();
+	}
 }

@@ -46,6 +46,12 @@
             <scope>test</scope>
         </dependency>
 
+ 		<dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -70,8 +76,14 @@
                     <mainClass>com.downkombat.Main</mainClass>
                 </configuration>
             </plugin>
+            
+              
+
 
         </plugins>
     </build>
+    
+    <!---->
+    
 
 </project>
