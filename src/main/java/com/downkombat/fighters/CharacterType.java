@@ -6,7 +6,7 @@ public enum CharacterType {
     SORAYA,
     MIGUE,
     DARIO,
-    PEPE,
-    JUANMA
+    JUANMA,
+    PEPE
 
 }

@@ -1,6 +1,8 @@
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/game/GameState.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/ui/HealthBar.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/SpecialAttack.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/audio/SoundManager.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/attacks/UberFailAttack.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/attacks/MolarAttack.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/input/InputHandler.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/DefaultPunch.java
@@ -11,6 +13,9 @@
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/Attack.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/fighters/FighterFactory.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/game/GameScene.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/projectiles/CarManager.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/projectiles/Car.java
+/Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/attacks/NepalShieldAttack.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/fighters/CharacterType.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/combat/projectiles/Projectile.java
 /Users/irenepascual/Documents/Proyectos/down-kombat/src/main/java/com/downkombat/Main.java

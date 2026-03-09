@@ -2,12 +2,16 @@ package com.downkombat.game;
 
 import com.downkombat.config.GameConfig;
 import com.downkombat.engine.GameLoop;
+
 import com.downkombat.fighters.CharacterType;
 import com.downkombat.fighters.Fighter;
 import com.downkombat.fighters.FighterFactory;
+
 import com.downkombat.input.InputHandler;
 import com.downkombat.ui.HealthBar;
+
 import com.downkombat.combat.projectiles.ProjectileManager;
+import com.downkombat.combat.projectiles.CarManager;
 
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -34,16 +38,16 @@ public class GameScene {
 
     private long freezeEndTime = 0;
 
-
-    // SISTEMA DE PROYECTILES
+    // managers
     private ProjectileManager projectileManager;
+    private CarManager carManager;
 
     public GameScene() {
 
         root = new Group();
 
-        // inicializar manager
         projectileManager = new ProjectileManager(root);
+        carManager = new CarManager(root);
 
         spawnPlayers();
 
@@ -79,10 +83,25 @@ public class GameScene {
         return projectileManager;
     }
 
+    public CarManager getCarManager() {
+        return carManager;
+    }
+
     private void spawnPlayers() {
 
-        player1 = FighterFactory.create(CharacterType.ANTONIO, 640 - 200, projectileManager);
-        player2 = FighterFactory.create(CharacterType.SORAYA, 640 + 200, projectileManager);
+        player1 = FighterFactory.create(
+                CharacterType.ANTONIO,
+                640 - 200,
+                projectileManager,
+                carManager
+        );
+
+        player2 = FighterFactory.create(
+                CharacterType.SORAYA,
+                640 + 200,
+                projectileManager,
+                carManager
+        );
 
         root.getChildren().addAll(
                 player1.getNode(),
@@ -107,21 +126,21 @@ public class GameScene {
             return;
         }
 
-        // MOVIMIENTO
+        // movimiento
         if (input.isPressed(KeyCode.A)) player1.moveLeft();
         if (input.isPressed(KeyCode.D)) player1.moveRight();
 
         if (input.isPressed(KeyCode.LEFT)) player2.moveLeft();
         if (input.isPressed(KeyCode.RIGHT)) player2.moveRight();
 
-        // LIMITES PANTALLA
+        // límites pantalla
         if (player1.getX() < 60) player1.setX(60);
         if (player1.getX() > GameConfig.WIDTH - 60) player1.setX(GameConfig.WIDTH - 60);
 
         if (player2.getX() < 60) player2.setX(60);
         if (player2.getX() > GameConfig.WIDTH - 60) player2.setX(GameConfig.WIDTH - 60);
 
-        // UPDATE PLAYERS
+        // update fighters
         player1.update();
         player2.update();
 
@@ -155,6 +174,7 @@ public class GameScene {
         }
 
         if (input.isPressed(KeyCode.L)) {
+
             if (player2.canSpecial()) {
                 player2.performSpecial(player1);
             }
@@ -163,6 +183,9 @@ public class GameScene {
         // UPDATE PROYECTILES
         projectileManager.update(player1);
         projectileManager.update(player2);
+
+        // UPDATE COCHES
+        carManager.update();
 
         // UI
         healthBarP1.update(player1.getHealth());
@@ -174,7 +197,6 @@ public class GameScene {
             winText.setText("PLAYER 2 WINS\nPress R to restart");
             winText.setVisible(true);
             gameState = GameState.GAME_OVER;
-
         }
 
         if (player2.isDead()) {

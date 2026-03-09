@@ -28,6 +28,8 @@ public class Fighter {
 
     private long flashEndTime = 0;
 
+    private boolean invulnerable = false;
+
     private static final double WIDTH = 125;
     private static final double HEIGHT = 250;
 
@@ -62,6 +64,18 @@ public class Fighter {
 
         originalColor = color;
         currentColor = color;
+    }
+
+    public void setInvulnerable(boolean value) {
+        invulnerable = value;
+    }
+
+    public boolean isInvulnerable() {
+        return invulnerable;
+    }
+
+    public void resetColor() {
+        sprite.setFill(originalColor);
     }
 
     public Color getOriginalColor() {
@@ -151,6 +165,10 @@ public class Fighter {
     }
 
     public void damage(int amount) {
+
+        if (invulnerable) {
+            return;
+        }
 
         if (health <= GameConfig.PLAYER_MAX_HEALTH * GameConfig.CRITICAL_HEALTH_THRESHOLD) {
             amount = (int)(amount * 1.5);

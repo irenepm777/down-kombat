@@ -2,52 +2,52 @@ package com.downkombat.combat.attacks;
 
 import com.downkombat.combat.SpecialAttack;
 import com.downkombat.fighters.Fighter;
+import com.downkombat.audio.SoundManager;
+
 import javafx.scene.paint.Color;
 
 public class TransformationAttack implements SpecialAttack {
 
+    private int duration;
+    private int damage;
+    private int knockback;
+
+    private Color transformColor;
+
+    private String soundPath;
+
     private boolean transformed = false;
-    private long transformEndTime = 0;
+    private long endTime = 0;
 
-    private final int duration;
-    private final int damageBoost;
-    private final int knockbackBoost;
+    public TransformationAttack(int duration, int damage, int knockback, Color color) {
 
-    private final Color transformColor;
-    private Color originalColor;
+        this(duration, damage, knockback, color, null);
+    }
 
-    public TransformationAttack(
-            int duration,
-            int damageBoost,
-            int knockbackBoost,
-            Color transformColor
-    ) {
+    public TransformationAttack(int duration, int damage, int knockback, Color color, String soundPath) {
+
         this.duration = duration;
-        this.damageBoost = damageBoost;
-        this.knockbackBoost = knockbackBoost;
-        this.transformColor = transformColor;
+        this.damage = damage;
+        this.knockback = knockback;
+        this.transformColor = color;
+        this.soundPath = soundPath;
     }
 
     @Override
     public void execute(Fighter attacker, Fighter defender) {
 
-        long now = System.currentTimeMillis();
-
         if (!transformed) {
 
             transformed = true;
-            transformEndTime = now + duration;
+            endTime = System.currentTimeMillis() + duration;
 
-            originalColor = attacker.getColor();
             attacker.setColor(transformColor);
 
+            if (soundPath != null) {
+                SoundManager.play(soundPath);
+            }
+
             System.out.println("TRANSFORMATION ACTIVATED");
-        }
-
-        if (transformed) {
-
-            defender.damage(damageBoost);
-            defender.applyKnockback(attacker, knockbackBoost);
         }
     }
 
@@ -56,13 +56,11 @@ public class TransformationAttack implements SpecialAttack {
 
         if (!transformed) return;
 
-        long now = System.currentTimeMillis();
-
-        if (now > transformEndTime) {
+        if (System.currentTimeMillis() > endTime) {
 
             transformed = false;
 
-            attacker.setColor(originalColor);
+            attacker.setColor(attacker.getColor());
 
             System.out.println("TRANSFORMATION ENDED");
         }
