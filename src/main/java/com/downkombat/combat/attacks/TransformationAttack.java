@@ -60,7 +60,7 @@ public class TransformationAttack implements SpecialAttack {
 
             transformed = false;
 
-            attacker.setColor(attacker.getColor());
+            attacker.setColor(attacker.getOriginalColor());
 
             System.out.println("TRANSFORMATION ENDED");
         }
