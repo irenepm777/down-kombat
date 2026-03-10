@@ -71,7 +71,7 @@ public class FighterFactory {
                                 15,
                                 60,
                                 Color.MEDIUMPURPLE,
-                                "/sounds/dario_golden.mp3"
+                                "/sounds/dario_golden.m4a"
                         )
                 );
 
