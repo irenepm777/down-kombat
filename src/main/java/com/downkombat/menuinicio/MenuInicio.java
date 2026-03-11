@@ -1,9 +1,5 @@
 package com.downkombat.menuinicio;
 
-import java.net.URL;
-
-import com.downkombat.audio.SoundManager;
-
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,7 +21,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.application.Platform;
 
 
 
@@ -124,21 +119,24 @@ public class MenuInicio extends Application {
 
 	// Reproductor de música de fondo (opcional, requiere archivo de audio y manejo de recursos)
 	private void playBackgroundMusic() {
-		try {
-			Media media = new Media(
-					getClass().getResource("/audio/BatallaTabla.mp3").toExternalForm()
-					);
+	    try {
+	        stop(); // Stop previous music if any
 
-			MediaPlayer mediaPlayer = new MediaPlayer(media);
-			mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-			mediaPlayer.setVolume(100); // Volumen al máximo
-			mediaPlayer.play();
+	        Media media = new Media(
+	            getClass().getResource("/sounds/Menu_Inicio.mp3").toExternalForm()
+	        );
 
-		} catch (Exception e) {
-			System.err.println("Error al cargar música de fondo: " + e.getMessage());
-		}
+	        player = new MediaPlayer(media); // Use global player
+	        player.setCycleCount(MediaPlayer.INDEFINITE); // Loop forever
+	        player.setVolume(1.0);
+	        player.play();
+
+	        System.out.println("Background music started");
+
+	    } catch (Exception e) {
+	        System.err.println("Error loading background music: " + e.getMessage());
+	    }
 	}
-
 	private VBox createMenuBox() {
 		VBox menuBox = new VBox(40);
 		menuBox.setAlignment(Pos.CENTER);
@@ -206,7 +204,7 @@ public class MenuInicio extends Application {
 	
 	private void musicTest() {
 		try {
-			Media media = new Media(getClass().getResource("/audio/BatallaTabla.mp3").toExternalForm());
+			Media media = new Media(getClass().getResource("\"C:\\Users\\Said\\Documents\\Repositorio\\down-kombat\\src\\main\\resources\\sounds\\Menu_Inicio.mp3\"").toExternalForm());
 			MediaPlayer mediaPlayer = new MediaPlayer(media);
 			mediaPlayer.setVolume(1.0);
 			mediaPlayer.play();
@@ -237,56 +235,6 @@ public class MenuInicio extends Application {
 			System.err.println("Error cargando CSS: " + e.getMessage());
 		}
 	}
-
-	
-	public static void play(String path) {
-
-	    Platform.runLater(() -> {
-
-	        try {
-	            stopMenu(); // Stop previous audio if playing
-
-	            URL resource = SoundManager.class.getResource(path); // Load resource using getResource for better compatibility
-	            if (resource == null) {
-	                System.out.println("ERROR: Sound file not found → " + path);
-	                return;
-	            }
-
-	            String uri = resource.toExternalForm();
-	            System.out.println("Loading audio: " + uri);
-
-	            Media media = new Media(uri);
-	           player = new MediaPlayer(media);
-
-	            player.setVolume(0.8); // Default volume
-
-	            player.setOnReady(() -> {
-	                System.out.println("AUDIO READY → PLAYING");
-	                player.play();
-	            });
-
-	            player.setOnError(() -> {
-	                System.out.println("MEDIA ERROR:");
-	                System.out.println(player.getError());
-	            });
-
-	        } catch (Exception e) {
-	            System.out.println(" AUDIO EXCEPTION:");
-	            e.printStackTrace();
-	        }
-
-	    });
-	}
-	
-	public static void stopMenu() {
-
-        if (player != null) {
-
-            player.stop();
-            player.dispose();
-            player = null;
-        }
-    }
 	
 	
 	
@@ -296,6 +244,14 @@ private void handleStart() {
 
 private void handleTutorial() {
 	System.out.println("MODO TUTORIAL ACTIVADO");
+}
+
+public static MediaPlayer getPlayer() {
+	return player;
+}
+
+public static void setPlayer(MediaPlayer player) {
+	MenuInicio.player = player;
 }
 
 }
