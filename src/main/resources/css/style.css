@@ -1,11 +1,13 @@
 /* ============================================
    STREET FIGHTER ARCADE MENU STYLES
    ============================================ */
-   
+
+/* Importar fuente estilo arcade */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 /* Fuentes alternativas si no se carga la principal */
 .root {
-    -fx-font-family: 'Press Start 2P';
+    -fx-font-family: 'Press Start 2P', 'Courier New', monospace;
 }
 
 /* ============================================
@@ -14,10 +16,7 @@
 #game-title {
     -fx-font-family: 'Press Start 2P', 'Courier New', monospace;
     -fx-font-size: 72px;
-
-    /* Gradiente compatible con JavaFX */
-    -fx-fill: linear-gradient(from 0% 0% to 0% 100%, #FFD700, #FF8C00, #FF4500);
-
+    -fx-fill: linear-gradient(to bottom, #FFD700, #FF8C00, #FF4500);
     -fx-stroke: #8B0000;
     -fx-stroke-width: 3px;
     -fx-text-alignment: center;
@@ -45,14 +44,14 @@
    BOTÓN START - Estilo Rojo/Dorado
    ============================================ */
 #start-button {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #DC143C, #8B0000);
+    -fx-background-color: linear-gradient(to bottom, #DC143C, #8B0000);
     -fx-text-fill: #FFD700;
     -fx-border-color: #FFD700;
     -fx-effect: dropshadow(gaussian, #8B0000, 0, 0, 0, 8);
 }
 
 #start-button:hover {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #FF1744, #DC143C);
+    -fx-background-color: linear-gradient(to bottom, #FF1744, #DC143C);
     -fx-text-fill: #FFFF00;
     -fx-border-color: #FFFF00;
     -fx-effect: dropshadow(gaussian, #FF1744, 20, 0.7, 0, 0);
@@ -60,7 +59,7 @@
 }
 
 #start-button:pressed {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #8B0000, #DC143C);
+    -fx-background-color: linear-gradient(to bottom, #8B0000, #DC143C);
     -fx-translate-y: 4px;
     -fx-effect: dropshadow(gaussian, #8B0000, 0, 0, 0, 4);
 }
@@ -69,14 +68,14 @@
    BOTÓN TUTORIAL - Estilo Azul/Plateado
    ============================================ */
 #tutorial-button {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #1E90FF, #00008B);
+    -fx-background-color: linear-gradient(to bottom, #1E90FF, #00008B);
     -fx-text-fill: #E0E0E0;
     -fx-border-color: #C0C0C0;
     -fx-effect: dropshadow(gaussian, #00008B, 0, 0, 0, 8);
 }
 
 #tutorial-button:hover {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #00BFFF, #1E90FF);
+    -fx-background-color: linear-gradient(to bottom, #00BFFF, #1E90FF);
     -fx-text-fill: #FFFFFF;
     -fx-border-color: #FFFFFF;
     -fx-effect: dropshadow(gaussian, #00BFFF, 20, 0.7, 0, 0);
@@ -84,14 +83,11 @@
 }
 
 #tutorial-button:pressed {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #00008B, #1E90FF);
+    -fx-background-color: linear-gradient(to bottom, #00008B, #1E90FF);
     -fx-translate-y: 4px;
     -fx-effect: dropshadow(gaussian, #00008B, 0, 0, 0, 4);
 }
 
-/* ============================================
-   CONTENEDOR DEL MENÚ
-   ============================================ */
 #menu-box {
     -fx-background-color: transparent;
 }
