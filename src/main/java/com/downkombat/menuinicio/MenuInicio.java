@@ -1,5 +1,9 @@
 package com.downkombat.menuinicio;
 
+import java.net.URL;
+
+import com.downkombat.audio.SoundManager;
+
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,16 +25,24 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.application.Platform;
+
 
 
 public class MenuInicio extends Application {
 
 	private static final int SCREEN_WIDTH = 1280;
 	private static final int SCREEN_HEIGHT = 720;
+	 private static MediaPlayer player;
+
 
 	@Override
 	public void start(Stage primaryStage) {
 		StackPane root = new StackPane();
+		
+		
+		
+		musicTest(); // Prueba de música para verificar que se carga correctamente
 
 		// ========== CAPA 1: FONDO (primero = detrás) ==========
 		ImageView bgImage = loadBackgroundImage();
@@ -191,6 +203,20 @@ public class MenuInicio extends Application {
 
 		return button;
 	}
+	
+	private void musicTest() {
+		try {
+			Media media = new Media(getClass().getResource("/audio/BatallaTabla.mp3").toExternalForm());
+			MediaPlayer mediaPlayer = new MediaPlayer(media);
+			mediaPlayer.setVolume(1.0);
+			mediaPlayer.play();
+			System.out.println("Música de prueba cargada y reproduciéndose correctamente");
+		} catch (Exception e) {
+			System.err.println("Error en musicTest: " + e.getMessage());
+		}
+	}
+	
+	
 
 	private void loadStylesheet(Scene scene) {
 		try {
@@ -212,6 +238,58 @@ public class MenuInicio extends Application {
 		}
 	}
 
+	
+	public static void play(String path) {
+
+	    Platform.runLater(() -> {
+
+	        try {
+	            stopMenu(); // Stop previous audio if playing
+
+	            URL resource = SoundManager.class.getResource(path); // Load resource using getResource for better compatibility
+	            if (resource == null) {
+	                System.out.println("ERROR: Sound file not found → " + path);
+	                return;
+	            }
+
+	            String uri = resource.toExternalForm();
+	            System.out.println("Loading audio: " + uri);
+
+	            Media media = new Media(uri);
+	           player = new MediaPlayer(media);
+
+	            player.setVolume(0.8); // Default volume
+
+	            player.setOnReady(() -> {
+	                System.out.println("AUDIO READY → PLAYING");
+	                player.play();
+	            });
+
+	            player.setOnError(() -> {
+	                System.out.println("MEDIA ERROR:");
+	                System.out.println(player.getError());
+	            });
+
+	        } catch (Exception e) {
+	            System.out.println(" AUDIO EXCEPTION:");
+	            e.printStackTrace();
+	        }
+
+	    });
+	}
+	
+	public static void stopMenu() {
+
+        if (player != null) {
+
+            player.stop();
+            player.dispose();
+            player = null;
+        }
+    }
+	
+	
+	
 private void handleStart() {
 	System.out.println("¡JUEGO INICIADO!");
 }
