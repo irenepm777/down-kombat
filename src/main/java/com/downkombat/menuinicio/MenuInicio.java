@@ -30,6 +30,10 @@ import javafx.util.Duration;
  * Main menu application.
  * Background uses a looping video if available; falls back to an image or gradient.
  * Buttons and title are styled via CSS (or inline fallback if CSS is missing).
+ *
+ * Behavior added:
+ * - When Tutorial button is pressed: pause background video and music, open Tutorial.
+ * - When the primary stage is shown again (Tutorial closed), resume video and music.
  */
 public class MenuInicio extends Application {
 
@@ -228,18 +232,36 @@ public class MenuInicio extends Application {
     }
 
     /**
-     * Stop and dispose the music player if it exists.
+     * Pause background video and music.
+     * Called before opening the Tutorial screen.
      */
-    private void stopMusic() {
-        if (player != null) {
-            try {
-                player.stop();
-                player.dispose();
-            } catch (Exception e) {
-                System.err.println("Error stopping music player: " + e.getMessage());
-            } finally {
-                player = null;
+    private void pauseBackgroundMedia() {
+        try {
+            if (backgroundVideoPlayer != null) {
+                backgroundVideoPlayer.pause();
             }
+            if (player != null) {
+                player.pause();
+            }
+        } catch (Exception e) {
+            System.err.println("Error pausing media: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Resume background video and music.
+     * Called when the primary stage becomes visible again.
+     */
+    private void resumeBackgroundMedia() {
+        try {
+            if (backgroundVideoPlayer != null) {
+                backgroundVideoPlayer.play();
+            }
+            if (player != null) {
+                player.play();
+            }
+        } catch (Exception e) {
+            System.err.println("Error resuming media: " + e.getMessage());
         }
     }
 
@@ -361,9 +383,25 @@ public class MenuInicio extends Application {
     }
 
     /**
-     * Handler to open the tutorial screen. Passes the current primary stage reference.
+     * Handler to open the tutorial screen.
+     * Pauses background media, opens Tutorial, and sets a one-time onShown handler
+     * to resume media when the primary stage is shown again.
      */
     private void handleTutorial() {
+        System.out.println("Opening Tutorial: pausing background media and launching tutorial screen");
+
+        // Pause background video and music
+        pauseBackgroundMedia();
+
+        // Set a one-time onShown handler to resume media when the primary stage is shown again
+        primaryStageRef.setOnShown(event -> {
+            // Resume media
+            resumeBackgroundMedia();
+            // Remove this handler so it doesn't run repeatedly
+            primaryStageRef.setOnShown(null);
+        });
+
+        // Open tutorial and pass the primary stage reference
         com.downkombat.tutorial.Tutorial tutorial = new com.downkombat.tutorial.Tutorial();
         tutorial.mostrar(this.primaryStageRef);
     }
@@ -402,7 +440,12 @@ public class MenuInicio extends Application {
         Platform.exit();
     }
 
-    public static void main(String[] args) {
+    private void stopMusic() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void main(String[] args) {
         launch(args);
     }
 }
