@@ -15,8 +15,9 @@ import javafx.stage.Stage;
 /**
  * Tutorial screen.
  * - Uses an image background if available, otherwise a simple fallback background.
- * - Provides a visible "back" button (Unicode arrow) that closes the tutorial and shows the previous stage.
- * - Loads CSS safely (no exception if stylesheet missing).
+ * - The back button uses the same visual style and interactive behavior as the menu buttons
+ *   in MenuInicio (class "arcade-button" and id "tutorial-button"), so CSS rules apply consistently.
+ * - Hover/press animations are preserved to match MenuInicio.
  */
 public class Tutorial {
 
@@ -39,7 +40,7 @@ public class Tutorial {
                 imageView = new ImageView(img);
                 imageView.setPreserveRatio(true);
                 imageView.setSmooth(true);
-                // We will bind fitWidth/fitHeight to the scene later
+                // fit binding will be applied after scene creation
             } else {
                 System.err.println("Tutorial image not found at /images/tutorialr.png — using fallback background.");
             }
@@ -54,42 +55,61 @@ public class Tutorial {
         } else {
             Rectangle fallback = new Rectangle(1280, 720, Color.web("#0b1220")); // dark fallback
             root.getChildren().add(fallback);
-            // Optional: add a small explanatory text so user knows tutorial loaded
             Text fallbackText = new Text("Tutorial (image not found)");
             fallbackText.setFill(Color.LIGHTGRAY);
             StackPane.setAlignment(fallbackText, Pos.CENTER);
             root.getChildren().add(fallbackText);
         }
 
-        // Create the back button using a Unicode arrow (no external asset required)
+        // Create the back button using the same style as MenuInicio buttons
         Button btnMain = new Button("←");
-        btnMain.getStyleClass().add("btn-volver-pixel-main"); // CSS class (optional)
+        // Match MenuInicio: class "arcade-button" and id "tutorial-button"
+        btnMain.getStyleClass().add("arcade-button");
+        btnMain.setId("tutorial-button");
+        btnMain.setMinWidth(50);
+        btnMain.setMinHeight(4);
         btnMain.setFocusTraversable(false);
 
         // Shadow button for pixel effect (mouseTransparent so it doesn't block clicks)
         Button btnShadow = new Button("←");
-        btnShadow.getStyleClass().add("btn-volver-pixel-shadow");
+        btnShadow.getStyleClass().add("arcade-button");
+        btnShadow.getStyleClass().add("tutorial-button"); // keep consistent classes for CSS if needed
         btnShadow.setMouseTransparent(true);
         btnShadow.setTranslateX(3);
         btnShadow.setTranslateY(3);
 
+        // Preserve the same interactive behavior as MenuInicio buttons:
+        // hover: scale + glow; press: translateY
+        btnMain.setOnMouseEntered(e -> {
+            btnMain.setScaleX(1.15);
+            btnMain.setScaleY(1.15);
+            // Keep visual effect minimal here; CSS can override appearance
+            btnMain.setEffect(new javafx.scene.effect.Glow(0.8));
+        });
+
+        btnMain.setOnMouseExited(e -> {
+            btnMain.setScaleX(1.0);
+            btnMain.setScaleY(1.0);
+            btnMain.setEffect(null);
+        });
+
+        btnMain.setOnMousePressed(e -> btnMain.setTranslateY(2));
+        btnMain.setOnMouseReleased(e -> btnMain.setTranslateY(0));
+
         // Stack the shadow and main button so it looks "pixelated"
-        VBox arrowBox = new VBox();
-        arrowBox.setAlignment(Pos.TOP_LEFT);
-        arrowBox.setTranslateX(20);
-        arrowBox.setTranslateY(20);
         StackPane arrowStack = new StackPane(btnShadow, btnMain);
         arrowStack.setAlignment(Pos.TOP_LEFT);
-        arrowBox.getChildren().add(arrowStack);
+        arrowStack.setTranslateX(20);
+        arrowStack.setTranslateY(20);
 
         // Add the arrow stack on top of the background
-        root.getChildren().add(arrowBox);
-        StackPane.setAlignment(arrowBox, Pos.TOP_LEFT);
+        root.getChildren().add(arrowStack);
+        StackPane.setAlignment(arrowStack, Pos.TOP_LEFT);
 
         // Button action: show previous stage and close this tutorial stage
         btnMain.setOnAction(e -> {
             try {
-                // Show the previous stage (MenuInicio). This will trigger any onShown handlers there.
+                // Show the previous stage (MenuInicio). MenuInicio should resume media on shown.
                 stageAnterior.show();
 
                 // Close the tutorial window
@@ -101,7 +121,7 @@ public class Tutorial {
         });
 
         // Create scene and bind image size if imageView exists
-        Scene scene = new Scene(root, 1280, 720);
+        Scene scene = new Scene(root, 1310, 740);
 
         if (imageView != null) {
             imageView.fitWidthProperty().bind(scene.widthProperty());
@@ -110,11 +130,11 @@ public class Tutorial {
 
         // Load stylesheet safely (no exception if missing)
         try {
-            var cssUrl = getClass().getResource("/css/styles.css");
+            var cssUrl = getClass().getResource("/css/style.css");
             if (cssUrl != null) {
                 scene.getStylesheets().add(cssUrl.toExternalForm());
             } else {
-                System.err.println("Tutorial stylesheet not found at /css/styles.css (optional).");
+                System.err.println("Tutorial stylesheet not found at /css/style.css (optional).");
             }
         } catch (Exception ex) {
             System.err.println("Error loading tutorial stylesheet: " + ex.getMessage());
@@ -125,8 +145,7 @@ public class Tutorial {
         stage.setTitle("Tutorial");
         stage.setScene(scene);
 
-        // Hide the previous stage before showing tutorial so background media is not visible
-        // (MenuInicio should have paused media already; if not, ensure it does before calling mostrar)
+        // Hide the previous stage before showing tutorial (MenuInicio should have paused media already)
         stageAnterior.hide();
 
         stage.show();
