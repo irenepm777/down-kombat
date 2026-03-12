@@ -6,21 +6,28 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
+import javafx.scene.media.MediaPlayer;
 
 /**
  * Tutorial screen.
  * - Uses an image background if available, otherwise a simple fallback background.
  * - The back button uses the same visual style and interactive behavior as the menu buttons
  *   in MenuInicio (class "arcade-button" and id "tutorial-button"), so CSS rules apply consistently.
- * - Hover/press animations are preserved to match MenuInicio.
+ * - Plays a looping tutorial background music while the tutorial is open.
+ * - Stops and disposes the tutorial music when the tutorial closes, then shows the previous stage.
  */
 public class Tutorial {
 
+    /**
+     * Show the tutorial stage.
+     * Pauses/resumes of MenuInicio media should be handled by the caller (MenuInicio).
+     */
     public void mostrar(Stage stageAnterior) {
         // Defensive: if caller passed null, avoid NPE and return
         if (stageAnterior == null) {
@@ -61,13 +68,45 @@ public class Tutorial {
             root.getChildren().add(fallbackText);
         }
 
+        // Tutorial music player (local variable so we can stop/dispose it on close)
+        final MediaPlayer[] tutorialPlayer = new MediaPlayer[1];
+
+        // Attempt to load tutorial music from resources/sounds/tutorial_music.mp3
+        try {
+            var musicUrl = getClass().getResource("/sounds/tutorial.mp3");
+            if (musicUrl != null) {
+                Media media = new Media(musicUrl.toExternalForm());
+                tutorialPlayer[0] = new MediaPlayer(media);
+                tutorialPlayer[0].setCycleCount(MediaPlayer.INDEFINITE); // loop
+                tutorialPlayer[0].setVolume(0.8); // adjust default volume as desired
+                // Start playback when ready
+                tutorialPlayer[0].setOnReady(() -> {
+                    try {
+                        tutorialPlayer[0].play();
+                        System.out.println("Tutorial music started");
+                    } catch (Exception e) {
+                        System.err.println("Error playing tutorial music: " + e.getMessage());
+                    }
+                });
+                // Log errors for debugging
+                tutorialPlayer[0].setOnError(() -> System.err.println("Tutorial MediaPlayer error: " + tutorialPlayer[0].getError()));
+                media.setOnError(() -> System.err.println("Tutorial Media error: " + media.getError()));
+            } else {
+                System.err.println("Tutorial music not found at /sounds/tutorialmusic.mp3 (optional).");
+            }
+        } catch (MediaException me) {
+            System.err.println("MediaException loading tutorial music: " + me.getMessage());
+        } catch (Exception ex) {
+            System.err.println("Exception loading tutorial music: " + ex.getMessage());
+        }
+
         // Create the back button using the same style as MenuInicio buttons
         Button btnMain = new Button("←");
         // Match MenuInicio: class "arcade-button" and id "tutorial-button"
         btnMain.getStyleClass().add("arcade-button");
         btnMain.setId("tutorial-button");
-        btnMain.setMinWidth(50);
-        btnMain.setMinHeight(4);
+        btnMain.setMinWidth(300);
+        btnMain.setMinHeight(70);
         btnMain.setFocusTraversable(false);
 
         // Shadow button for pixel effect (mouseTransparent so it doesn't block clicks)
@@ -83,7 +122,6 @@ public class Tutorial {
         btnMain.setOnMouseEntered(e -> {
             btnMain.setScaleX(1.15);
             btnMain.setScaleY(1.15);
-            // Keep visual effect minimal here; CSS can override appearance
             btnMain.setEffect(new javafx.scene.effect.Glow(0.8));
         });
 
@@ -106,10 +144,22 @@ public class Tutorial {
         root.getChildren().add(arrowStack);
         StackPane.setAlignment(arrowStack, Pos.TOP_LEFT);
 
-        // Button action: show previous stage and close this tutorial stage
+        // Button action: stop tutorial music, show previous stage and close this tutorial stage
         btnMain.setOnAction(e -> {
             try {
-                // Show the previous stage (MenuInicio). MenuInicio should resume media on shown.
+                // Stop and dispose tutorial music if playing
+                if (tutorialPlayer[0] != null) {
+                    try {
+                        tutorialPlayer[0].stop();
+                        tutorialPlayer[0].dispose();
+                    } catch (Exception ex) {
+                        System.err.println("Error stopping tutorial music: " + ex.getMessage());
+                    } finally {
+                        tutorialPlayer[0] = null;
+                    }
+                }
+
+                // Show the previous stage (MenuInicio). MenuInicio should resume its media on shown.
                 stageAnterior.show();
 
                 // Close the tutorial window
@@ -121,7 +171,7 @@ public class Tutorial {
         });
 
         // Create scene and bind image size if imageView exists
-        Scene scene = new Scene(root, 1310, 740);
+        Scene scene = new Scene(root, 1280, 720);
 
         if (imageView != null) {
             imageView.fitWidthProperty().bind(scene.widthProperty());
@@ -144,6 +194,26 @@ public class Tutorial {
         Stage stage = new Stage();
         stage.setTitle("Tutorial");
         stage.setScene(scene);
+
+        // Ensure tutorial music is stopped/disposed if the user closes the window via the window manager
+        stage.setOnCloseRequest(ev -> {
+            if (tutorialPlayer[0] != null) {
+                try {
+                    tutorialPlayer[0].stop();
+                    tutorialPlayer[0].dispose();
+                } catch (Exception ex) {
+                    System.err.println("Error disposing tutorial music on close: " + ex.getMessage());
+                } finally {
+                    tutorialPlayer[0] = null;
+                }
+            }
+            // Show the previous stage so MenuInicio can resume its media
+            try {
+                stageAnterior.show();
+            } catch (Exception ex) {
+                // ignore
+            }
+        });
 
         // Hide the previous stage before showing tutorial (MenuInicio should have paused media already)
         stageAnterior.hide();
