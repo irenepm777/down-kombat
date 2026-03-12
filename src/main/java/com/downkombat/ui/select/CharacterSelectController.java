@@ -59,12 +59,13 @@ public class CharacterSelectController {
         grid.setAlignment(Pos.CENTER);
 
         // Creates six character selection buttons.
-        Button btn1 = createButton("char1", "red");
-        Button btn2 = createButton("char2", "black");
-        Button btn3 = createButton("char3", "blue");
-        Button btn4 = createButton("char4", "green");
-        Button btn5 = createButton("char5", "purple");
-        Button btn6 = createButton("char6", "orange");
+        // Each button now uses a SKIN from /character_sheet/film/frame/
+        StackPane btn1 = createButton("marco_antonio");
+        StackPane btn2 = createButton("marco_dario");
+        StackPane btn3 = createButton("marco_juanma");
+        StackPane btn4 = createButton("marco_miguel");
+        StackPane btn5 = createButton("marco_pepe");
+        StackPane btn6 = createButton("marco_soraya");
 
         // Adds buttons to the grid.
         grid.add(btn1, 0, 0);
@@ -88,19 +89,40 @@ public class CharacterSelectController {
         scene = new Scene(root, 800, 600);
     }
 
-    private Button createButton(String characterName, String color) {
+    private StackPane createButton(String characterName) {
 
-        // Creates a square button with a solid color representing a character.
+        // ======== 1. Imagen del marco ========
+        javafx.scene.image.Image img = new javafx.scene.image.Image(
+            getClass().getResourceAsStream("/frame/" + characterName + ".png")
+        );
+
+        javafx.scene.image.ImageView frame = new javafx.scene.image.ImageView(img);
+        frame.setFitWidth(120);
+        frame.setFitHeight(120);
+
+        // ======== 2. Botón transparente encima ========
         Button btn = new Button();
-        btn.setPrefSize(90, 90);
+        btn.setPrefSize(120, 120);
 
-        btn.setStyle("-fx-background-color: " + color + ";");
+        btn.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-border-color: transparent;" +
+            "-fx-padding: 0;"
+        );
 
-        // When clicked, the button selects the character.
         btn.setOnAction(e -> selectCharacter(characterName));
 
-        return btn;
+        // ======== 3. StackPane para superponer marco + botón ========
+        StackPane slot = new StackPane();
+        slot.getChildren().addAll(frame, btn);
+
+        return slot;
     }
+
+
+
+
+
 
     private void selectCharacter(String characterName) {
         // Saves the selected character depending on which player is choosing.
