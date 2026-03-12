@@ -91,3 +91,53 @@
 #menu-box {
     -fx-background-color: transparent;
 }
+
+.btn-volver {
+    -fx-background-color: rgba(0,0,0,0.45);
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10 6 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 6, 0, 0, 2);
+    -fx-border-color: transparent;
+}
+
+/* Sombra "pixel" (botón detrás, offset para efecto bloque) */
+.btn-volver-pixel-shadow {
+    -fx-background-color: #000000; /* color de la sombra */
+    -fx-text-fill: transparent;    /* ocultar texto de la sombra (solo forma) */
+    -fx-font-family: "monospace";
+    -fx-font-size: 20px;
+    -fx-padding: 6 10 6 10;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 3;
+    /* offset "pixelado": movemos el nodo shadow con translate en CSS no es fiable en JavaFX,
+       por eso en Java colocamos la sombra detrás con un pequeño translate manual si quieres
+       otro offset, ajusta botonPixelStack children translateX/Y. */
+    -fx-effect: null;
+}
+
+/* Botón principal estilo pixel art */
+.btn-volver-pixel-main {
+    -fx-background-color: linear-gradient(#f7c948 0%, #f0a500 100%); /* tono "amarillo pixel" */
+    -fx-text-fill: #000000;
+    -fx-font-family: "monospace";
+    -fx-font-size: 20px;
+    -fx-padding: 6 10 6 10;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 3;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.0), 0, 0, 0, 0); /* sin blur */
+}
+
+/* Hover: efecto simple (mantener "cuadrado") */
+.btn-volver-pixel-main:hover {
+    -fx-background-color: linear-gradient(#ffd86b 0%, #ffb84a 100%);
+    -fx-translate-y: 0; /* no suavizar */
+}
+
+/* Si quieres texto más "pixelado" usa una fuente monoespaciada o añade una fuente pixel */
