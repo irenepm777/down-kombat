@@ -24,6 +24,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class MenuInicio extends Application {
 
@@ -35,33 +36,24 @@ public class MenuInicio extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Guardar referencia del primaryStage para usarla en handlers
         this.primaryStageRef = primaryStage;
 
         StackPane root = new StackPane();
 
-        musicTest(); // Prueba de música (usa la misma ruta que playBackgroundMusic)
+        musicTest();
 
-        // ========== CAPA 1: FONDO (primero = detrás) ==========
-        // Intentamos cargar el vídeo de fondo (ruta en resources: /video/fondoInicio.mp4)
+        // Cargar vídeo de fondo (si existe) — si no, imagen o gradiente
         MediaView bgVideo = loadBackgroundVideo();
         if (bgVideo != null) {
-            // Añadir el MediaView primero para que quede detrás de todo
             root.getChildren().add(bgVideo);
         } else {
-            // Si no hay vídeo, intentar imagen; si tampoco, gradiente
             ImageView bgImage = loadBackgroundImage();
-            if (bgImage != null) {
-                root.getChildren().add(bgImage);
-            } else {
-                Rectangle background = createArcadeBackground();
-                root.getChildren().add(background);
-            }
+            if (bgImage != null) root.getChildren().add(bgImage);
+            else root.getChildren().add(createArcadeBackground());
         }
 
-        // ========== CAPA 2: MENÚ (encima de todo) ==========
-        VBox menuBox = createMenuBox(); // Caja para el menú con fondo semitransparente y efectos
-        Text gameTitle = createGameTitle(); // Título con fuente arcade y efectos
+        VBox menuBox = createMenuBox();
+        Text gameTitle = createGameTitle();
         Button startButton = createMenuButton("START", "start-button");
         Button tutorialButton = createMenuButton("TUTORIAL", "tutorial-button");
 
@@ -71,14 +63,13 @@ public class MenuInicio extends Application {
         menuBox.getChildren().addAll(gameTitle, startButton, tutorialButton);
         root.getChildren().add(menuBox);
 
-        // Crear escena
-        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT); // Tamaño fijo para evitar problemas de escalado
+        Scene scene = new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-        // Si hay MediaView, enlazar sus dimensiones a la escena para que ocupe todo el fondo
+        // Enlazar MediaView al tamaño de la escena para cubrir todo el fondo
         if (bgVideo != null) {
             bgVideo.fitWidthProperty().bind(scene.widthProperty());
             bgVideo.fitHeightProperty().bind(scene.heightProperty());
-            bgVideo.setPreserveRatio(false); // false para cubrir toda la escena sin dejar bandas
+            bgVideo.setPreserveRatio(false);
             bgVideo.setSmooth(true);
         }
 
@@ -90,15 +81,9 @@ public class MenuInicio extends Application {
         primaryStage.show();
 
         playBackgroundMusic();
-        System.out.println("Música de fondo cargada correctamente");
     }
 
-    // ========== MÉTODOS DE CARGA DE RECURSOS ==========
-
-    /**
-     * Carga el vídeo de fondo desde resources/video/fondoInicio.mp4.
-     * Devuelve un MediaView si se pudo crear correctamente, o null si falla.
-     */
+    // Carga y configura MediaView para reproducir en bucle
     private MediaView loadBackgroundVideo() {
         try {
             var url = getClass().getResource("/video/fondoInicio.mp4");
@@ -111,30 +96,23 @@ public class MenuInicio extends Application {
             backgroundVideoPlayer = new MediaPlayer(media);
 
             // Manejo de errores para depuración
-            backgroundVideoPlayer.setOnError(() -> {
-                System.err.println("MediaPlayer error: " + backgroundVideoPlayer.getError());
-            });
-            media.setOnError(() -> {
-                System.err.println("Media error: " + media.getError());
-            });
+            backgroundVideoPlayer.setOnError(() -> System.err.println("MediaPlayer error: " + backgroundVideoPlayer.getError()));
+            media.setOnError(() -> System.err.println("Media error: " + media.getError()));
 
-            // Reproducir cuando esté listo; asegurar loop
+            // Asegurar bucle: ciclo indefinido y fallback con seek al final
+            backgroundVideoPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+            backgroundVideoPlayer.setOnEndOfMedia(() -> backgroundVideoPlayer.seek(Duration.ZERO));
+
+            // Reproducir cuando esté listo
             backgroundVideoPlayer.setOnReady(() -> {
-                try {
-                    backgroundVideoPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-                    backgroundVideoPlayer.setVolume(0.0); // silenciar por defecto; cambia si quieres audio
-                    backgroundVideoPlayer.play();
-                    System.out.println("Background video ready and playing");
-                } catch (Exception ex) {
-                    System.err.println("Error al reproducir vídeo: " + ex.getMessage());
-                }
+                backgroundVideoPlayer.setVolume(0.0); // silenciar por defecto si quieres
+                backgroundVideoPlayer.play();
+                System.out.println("Background video ready and playing (looping)");
             });
 
             MediaView mediaView = new MediaView(backgroundVideoPlayer);
             mediaView.setPreserveRatio(false);
             mediaView.setSmooth(true);
-
-            System.out.println("Vídeo de fondo cargado (MediaView creado)");
             return mediaView;
 
         } catch (MediaException me) {
@@ -146,34 +124,19 @@ public class MenuInicio extends Application {
         }
     }
 
-    /**
-     * Fallback: carga la imagen de fondo si no hay vídeo.
-     */
     private ImageView loadBackgroundImage() {
         try {
             var stream = getClass().getResourceAsStream("/images/fondo.png");
-            if (stream == null) {
-                System.err.println("No se encontró /images/fondo.png");
-                return null;
-            }
-
+            if (stream == null) return null;
             Image bg = new Image(stream);
-
-            if (bg.isError()) {
-                System.err.println("Error: La imagen fondo.png existe pero no se pudo cargar");
-                return null;
-            }
-
+            if (bg.isError()) return null;
             ImageView bgImage = new ImageView(bg);
             bgImage.setFitWidth(SCREEN_WIDTH);
             bgImage.setFitHeight(SCREEN_HEIGHT);
             bgImage.setPreserveRatio(false);
-
-            System.out.println("Fondo cargado correctamente: " + bg.getWidth() + "x" + bg.getHeight());
             return bgImage;
-
         } catch (Exception e) {
-            System.err.println("Error al cargar fondo: " + e.getMessage());
+            System.err.println("Error al cargar imagen de fondo: " + e.getMessage());
             return null;
         }
     }
@@ -186,79 +149,44 @@ public class MenuInicio extends Application {
                 new Stop(0.7, Color.MIDNIGHTBLUE),
                 new Stop(1, Color.DARKORANGE)
         );
-
         Rectangle bg = new Rectangle(SCREEN_WIDTH, SCREEN_HEIGHT);
         bg.setFill(gradient);
         return bg;
     }
 
-    // ========== MÚSICA DE FONDO ==========
-
     private void playBackgroundMusic() {
         try {
-            stopMusic(); // Detener música previa si existe
-
+            stopMusic();
             var url = getClass().getResource("/sounds/Menu_Inicio.mp3");
-            if (url == null) {
-                System.err.println("No se encontró /sounds/Menu_Inicio.mp3");
-                return;
-            }
-
+            if (url == null) return;
             Media media = new Media(url.toExternalForm());
             player = new MediaPlayer(media);
             player.setCycleCount(MediaPlayer.INDEFINITE);
             player.setVolume(1.0);
             player.play();
-
-            System.out.println("Background music started");
-
         } catch (Exception e) {
             System.err.println("Error loading background music: " + e.getMessage());
         }
     }
 
-    private void stopMusic() {
-        if (player != null) {
-            try {
-                player.stop();
-                player.dispose();
-            } catch (Exception e) {
-                System.err.println("Error al detener player: " + e.getMessage());
-            } finally {
-                player = null;
-            }
-        }
-    }
-
-    // ========== UI: menú, título y botones ==========
-
     private VBox createMenuBox() {
         VBox menuBox = new VBox(40);
         menuBox.setAlignment(Pos.CENTER);
-        menuBox.setTranslateY(100); // Bajar para no tapar el logo
-
-        Glow glow = new Glow(0.2);
-        menuBox.setEffect(glow);
-
+        menuBox.setTranslateY(100);
+        menuBox.setEffect(new Glow(0.2));
         return menuBox;
     }
 
     private Text createGameTitle() {
         Text title = new Text("DOWN\nKOMBAT");
         title.setId("game-title");
-
         try {
             Font arcadeFont = Font.loadFont(getClass().getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 64);
-            if (arcadeFont != null) {
-                title.setFont(arcadeFont);
-            } else {
-                title.setFont(Font.font("Monospace", FontWeight.BOLD, 64));
-            }
+            if (arcadeFont != null) title.setFont(arcadeFont);
+            else title.setFont(Font.font("Monospace", FontWeight.BOLD, 64));
         } catch (Exception e) {
             title.setFont(Font.font("Monospace", FontWeight.BOLD, 64));
-            System.err.println("Error al cargar fuente arcade: " + e.getMessage());
         }
-
         DropShadow shadow = new DropShadow();
         shadow.setColor(Color.ORANGE);
         shadow.setRadius(15);
@@ -267,7 +195,6 @@ public class MenuInicio extends Application {
         shadow.setOffsetY(4);
         title.setEffect(shadow);
         title.setFill(Color.GOLD);
-
         return title;
     }
 
@@ -281,8 +208,7 @@ public class MenuInicio extends Application {
         button.setOnMouseEntered(e -> {
             button.setScaleX(1.15);
             button.setScaleY(1.15);
-            Glow glow = new Glow(0.8);
-            button.setEffect(glow);
+            button.setEffect(new Glow(0.8));
         });
 
         button.setOnMouseExited(e -> {
@@ -297,53 +223,32 @@ public class MenuInicio extends Application {
         return button;
     }
 
-    // musicTest corregido: usa la misma ruta de recursos que playBackgroundMusic
     private void musicTest() {
         try {
             var url = getClass().getResource("/sounds/Menu_Inicio.mp3");
-            if (url == null) {
-                System.err.println("musicTest: no se encontró /sounds/Menu_Inicio.mp3");
-                return;
-            }
+            if (url == null) return;
             Media media = new Media(url.toExternalForm());
             MediaPlayer mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.setVolume(0.0); // volumen 0 para solo probar carga sin molestar
+            mediaPlayer.setVolume(0.0);
             mediaPlayer.play();
-            // detener inmediatamente para no interferir con la música real
             mediaPlayer.stop();
             mediaPlayer.dispose();
-            System.out.println("musicTest: recurso de audio accesible");
         } catch (Exception e) {
             System.err.println("Error en musicTest: " + e.getMessage());
         }
     }
 
-    // Cargar hoja de estilos desde resources/css/style.css
     private void loadStylesheet(Scene scene) {
         try {
             var url = getClass().getResource("/css/style.css");
-
-            if (url == null) {
-                System.err.println("CSS no encontrado en /css/style.css");
-                return;
-            }
-
-            String css = url.toExternalForm();
-            scene.getStylesheets().add(css);
-
-            System.out.println("CSS cargado correctamente: " + css);
-
+            if (url == null) return;
+            scene.getStylesheets().add(url.toExternalForm());
         } catch (Exception e) {
             System.err.println("Error cargando CSS: " + e.getMessage());
         }
     }
 
-    // ========== HANDLERS ==========
-
     private void handleTutorial() {
-        System.out.println("MODO TUTORIAL ACTIVADO");
-
-        // Asegurarse de pasar la referencia del primaryStage actual
         com.downkombat.tutorial.Tutorial tutorial = new com.downkombat.tutorial.Tutorial();
         tutorial.mostrar(this.primaryStageRef);
     }
@@ -360,10 +265,8 @@ public class MenuInicio extends Application {
         MenuInicio.player = player;
     }
 
-    // Asegurar liberar recursos al cerrar la app
     @Override
     public void stop() {
-        // Liberar vídeo de fondo si existe
         if (backgroundVideoPlayer != null) {
             try {
                 backgroundVideoPlayer.stop();
@@ -376,5 +279,22 @@ public class MenuInicio extends Application {
         }
         stopMusic();
         Platform.exit();
+    }
+
+    private void stopMusic() {
+        if (player != null) {
+            try {
+                player.stop();
+                player.dispose();
+            } catch (Exception e) {
+                System.err.println("Error al detener player: " + e.getMessage());
+            } finally {
+                player = null;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }
