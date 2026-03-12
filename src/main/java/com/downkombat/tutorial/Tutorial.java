@@ -78,7 +78,7 @@ public class Tutorial {
                 Media media = new Media(musicUrl.toExternalForm());
                 tutorialPlayer[0] = new MediaPlayer(media);
                 tutorialPlayer[0].setCycleCount(MediaPlayer.INDEFINITE); // loop
-                tutorialPlayer[0].setVolume(0.8); // adjust default volume as desired
+                tutorialPlayer[0].setVolume(0.5); // adjust default volume as desired
                 // Start playback when ready
                 tutorialPlayer[0].setOnReady(() -> {
                     try {
