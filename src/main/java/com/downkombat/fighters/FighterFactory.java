@@ -5,6 +5,7 @@ import com.downkombat.combat.attacks.TransformationAttack;
 import com.downkombat.combat.attacks.MolarAttack;
 import com.downkombat.combat.attacks.UberFailAttack;
 import com.downkombat.combat.attacks.NepalShieldAttack;
+
 import com.downkombat.combat.projectiles.ProjectileManager;
 import com.downkombat.combat.projectiles.CarManager;
 
@@ -25,6 +26,7 @@ public class FighterFactory {
 
             case ANTONIO:
                 return new Fighter(
+                        "antonio",
                         x,
                         GameConfig.GROUND_Y,
                         Color.RED,
@@ -39,6 +41,7 @@ public class FighterFactory {
 
             case SORAYA:
                 return new Fighter(
+                        "soraya",
                         x,
                         GameConfig.GROUND_Y,
                         Color.BLUE,
@@ -48,6 +51,7 @@ public class FighterFactory {
 
             case MIGUE:
                 return new Fighter(
+                        "migue",
                         x,
                         GameConfig.GROUND_Y,
                         Color.GREEN,
@@ -62,6 +66,7 @@ public class FighterFactory {
 
             case DARIO:
                 return new Fighter(
+                        "dario",
                         x,
                         GameConfig.GROUND_Y,
                         Color.PURPLE,
@@ -71,12 +76,13 @@ public class FighterFactory {
                                 15,
                                 60,
                                 Color.MEDIUMPURPLE,
-                                "/sounds/dario_golden.m4a"
+                                "/sounds/dario_golden.mp3"
                         )
                 );
 
             case JUANMA:
                 return new Fighter(
+                        "juanma",
                         x,
                         GameConfig.GROUND_Y,
                         Color.ORANGE,
@@ -86,6 +92,7 @@ public class FighterFactory {
 
             case PEPE:
                 return new Fighter(
+                        "pepe",
                         x,
                         GameConfig.GROUND_Y,
                         Color.YELLOW,

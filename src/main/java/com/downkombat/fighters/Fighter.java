@@ -15,6 +15,8 @@ import java.util.List;
 
 public class Fighter {
 
+    private String fighterId;
+
     private Group node;
     private ImageView sprite;
     private AnimationPlayer animationPlayer;
@@ -43,24 +45,31 @@ public class Fighter {
 
     private static final double SPRITE_HEIGHT = 600;
 
-    public Fighter(double x, double groundY, Color color,
-                   SpecialAttack normalAttack,
-                   SpecialAttack specialAttack) {
+    public Fighter(
+            String fighterId,
+            double x,
+            double groundY,
+            Color color,
+            SpecialAttack normalAttack,
+            SpecialAttack specialAttack
+    ) {
+
+        this.fighterId = fighterId;
 
         this.normalAttack = normalAttack;
         this.specialAttack = specialAttack;
 
         node = new Group();
 
-        // sprite base
         Image image = new Image(
-                Fighter.class.getResource("/sprites/fighters/antonio/antonio.png").toExternalForm()
+                Fighter.class.getResource(
+                        "/sprites/fighters/" + fighterId + "/" + fighterId + ".png"
+                ).toExternalForm()
         );
 
         sprite = new ImageView(image);
 
         sprite.setSmooth(false);
-
         sprite.setFitHeight(SPRITE_HEIGHT);
         sprite.setPreserveRatio(true);
 
@@ -77,7 +86,6 @@ public class Fighter {
             sprite.setScaleX(-1);
         }
 
-        // colores
         originalColor = color;
         currentColor = color;
 
@@ -86,12 +94,12 @@ public class Fighter {
         try {
 
             idleFrames = AnimationLoader.load(
-                    "/sprites/fighters/antonio/idle",
+                    "/sprites/fighters/" + fighterId + "/idle",
                     4
             );
 
             walkFrames = AnimationLoader.load(
-                    "/sprites/fighters/antonio/walk",
+                    "/sprites/fighters/" + fighterId + "/walk",
                     4
             );
 
@@ -99,7 +107,7 @@ public class Fighter {
 
         } catch (Exception e) {
 
-            System.out.println("Animation load failed, using static sprite.");
+            System.out.println("Animation load failed for " + fighterId);
 
         }
     }
@@ -156,7 +164,6 @@ public class Fighter {
         node.setTranslateX(node.getTranslateX() - speed);
 
         setFacingRight(false);
-
         setState(AnimationState.WALK);
     }
 
@@ -165,7 +172,6 @@ public class Fighter {
         node.setTranslateX(node.getTranslateX() + speed);
 
         setFacingRight(true);
-
         setState(AnimationState.WALK);
     }
 
@@ -256,22 +262,6 @@ public class Fighter {
         return currentState;
     }
 
-    public void setColor(Color color) {
-        currentColor = color;
-    }
-
-    public void resetColor() {
-        currentColor = originalColor;
-    }
-
-    public Color getColor() {
-        return currentColor;
-    }
-
-    public Color getOriginalColor() {
-        return originalColor;
-    }
-
     public void update() {
 
         long now = System.currentTimeMillis();
@@ -284,9 +274,7 @@ public class Fighter {
             specialAttack.update(this);
         }
 
-        if (animationPlayer != null) {
-            animationPlayer.update();
-        }
+        animationPlayer.update();
 
         if (currentState == AnimationState.WALK) {
             setState(AnimationState.IDLE);
