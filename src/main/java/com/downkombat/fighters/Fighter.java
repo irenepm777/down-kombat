@@ -19,6 +19,9 @@ public class Fighter {
     private ImageView sprite;
     private AnimationPlayer animationPlayer;
 
+    private List<Image> idleFrames;
+    private List<Image> walkFrames;
+
     private double speed = GameConfig.PLAYER_SPEED;
     private int health = GameConfig.PLAYER_MAX_HEALTH;
 
@@ -78,14 +81,17 @@ public class Fighter {
         originalColor = color;
         currentColor = color;
 
-        // inicializar animation player
         animationPlayer = new AnimationPlayer(sprite);
 
-        // cargar animación idle
         try {
 
-            List<Image> idleFrames = AnimationLoader.load(
+            idleFrames = AnimationLoader.load(
                     "/sprites/fighters/antonio/idle",
+                    4
+            );
+
+            walkFrames = AnimationLoader.load(
+                    "/sprites/fighters/antonio/walk",
                     4
             );
 
@@ -93,7 +99,7 @@ public class Fighter {
 
         } catch (Exception e) {
 
-            System.out.println("Idle animation not found, using static sprite.");
+            System.out.println("Animation load failed, using static sprite.");
 
         }
     }
@@ -150,6 +156,8 @@ public class Fighter {
         node.setTranslateX(node.getTranslateX() - speed);
 
         setFacingRight(false);
+
+        setState(AnimationState.WALK);
     }
 
     public void moveRight() {
@@ -157,6 +165,8 @@ public class Fighter {
         node.setTranslateX(node.getTranslateX() + speed);
 
         setFacingRight(true);
+
+        setState(AnimationState.WALK);
     }
 
     public boolean isFacing(Fighter other) {
@@ -226,8 +236,19 @@ public class Fighter {
 
     public void setState(AnimationState newState) {
 
-        if (currentState != newState) {
-            currentState = newState;
+        if (currentState == newState) return;
+
+        currentState = newState;
+
+        switch (newState) {
+
+            case IDLE:
+                animationPlayer.play(idleFrames, 150);
+                break;
+
+            case WALK:
+                animationPlayer.play(walkFrames, 120);
+                break;
         }
     }
 
@@ -265,6 +286,10 @@ public class Fighter {
 
         if (animationPlayer != null) {
             animationPlayer.update();
+        }
+
+        if (currentState == AnimationState.WALK) {
+            setState(AnimationState.IDLE);
         }
     }
 }
