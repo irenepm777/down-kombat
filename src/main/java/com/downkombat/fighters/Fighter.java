@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
 import java.util.List;
+import java.util.Map;
 
 public class Fighter {
 
@@ -21,10 +22,12 @@ public class Fighter {
     private ImageView sprite;
     private AnimationPlayer animationPlayer;
 
-    private List<Image> idleFrames;
-    private List<Image> walkFrames;
-    private List<Image> attackFrames;
-    private List<Image> hitFrames;
+    private Map<AnimationState, List<Image>> normalAnimations;
+    private Map<AnimationState, List<Image>> specialAnimations;
+
+    private List<Image> specialFrames;
+
+    private boolean transformed = false;
 
     private double speed = GameConfig.PLAYER_SPEED;
     private int health = GameConfig.PLAYER_MAX_HEALTH;
@@ -40,17 +43,16 @@ public class Fighter {
 
     private long lastAttackTime = 0;
     private long lastSpecialTime = 0;
-    private long flashEndTime = 0;
 
     private long attackStateEndTime = 0;
     private long hitStateEndTime = 0;
-
-    private Color originalColor;
-    private Color currentColor;
+    private long specialStateEndTime = 0;
 
     private static final double SPRITE_HEIGHT = 600;
+
     private static final long ATTACK_ANIMATION_DURATION = 220;
     private static final long HIT_ANIMATION_DURATION = 180;
+    private static final long SPECIAL_ANIMATION_DURATION = 300;
 
     public Fighter(
             String fighterId,
@@ -60,6 +62,7 @@ public class Fighter {
             SpecialAttack normalAttack,
             SpecialAttack specialAttack
     ) {
+
         this.fighterId = fighterId;
         this.normalAttack = normalAttack;
         this.specialAttack = specialAttack;
@@ -73,12 +76,12 @@ public class Fighter {
         );
 
         sprite = new ImageView(image);
+
         sprite.setSmooth(false);
-        sprite.setCache(true);
         sprite.setFitHeight(SPRITE_HEIGHT);
         sprite.setPreserveRatio(true);
 
-        sprite.setTranslateX(-sprite.getFitWidth() / 2);
+        sprite.setTranslateX(-SPRITE_HEIGHT / 4);
         sprite.setTranslateY(-SPRITE_HEIGHT);
 
         node.getChildren().add(sprite);
@@ -91,232 +94,278 @@ public class Fighter {
             sprite.setScaleX(-1);
         }
 
-        originalColor = color;
-        currentColor = color;
-
         animationPlayer = new AnimationPlayer(sprite);
 
         try {
-            var animations = AnimationLoader.load(
+
+            normalAnimations = AnimationLoader.load(
                     "/sprites/fighters/" + fighterId
             );
 
-            idleFrames = animations.get(AnimationState.IDLE);
-            walkFrames = animations.get(AnimationState.WALK);
-            attackFrames = animations.get(AnimationState.ATTACK);
-            hitFrames = animations.get(AnimationState.HIT);
+            specialFrames = AnimationLoader.loadSpecial(
+                    "/sprites/fighters/" + fighterId + "/special"
+            );
 
-            if (idleFrames != null && !idleFrames.isEmpty()) {
-                animationPlayer.play(idleFrames, 150);
+            // intenta cargar animaciones de transformación
+            specialAnimations = AnimationLoader.load(
+                    "/sprites/fighters/" + fighterId + "/special"
+            );
+
+              // si no hay animaciones intenta cargar frames simples
+            if (specialAnimations == null || specialAnimations.isEmpty()) {
+
+                specialFrames = AnimationLoader.loadSpecial(
+                        "/sprites/fighters/" + fighterId + "/special"
+                );
+
             }
+
+            playAnimation(AnimationState.IDLE);
+
         } catch (Exception e) {
+
             System.out.println("Animation load failed for " + fighterId);
+
         }
+    }
+
+    private Map<AnimationState, List<Image>> currentAnimations() {
+
+        if (transformed && specialAnimations != null) {
+            return specialAnimations;
+        }
+
+        return normalAnimations;
+    }
+
+    private void playAnimation(AnimationState state) {
+
+        Map<AnimationState, List<Image>> animations = currentAnimations();
+
+        List<Image> frames = animations.get(state);
+
+        if (frames != null && !frames.isEmpty()) {
+
+            int speed = switch (state) {
+
+                case WALK -> 120;
+                case ATTACK -> 80;
+                case HIT -> 100;
+                default -> 150;
+
+            };
+
+            animationPlayer.play(frames, speed);
+        }
+    }
+
+    public void performAttack(Fighter enemy) {
+
+        lastAttackTime = System.currentTimeMillis();
+
+        normalAttack.execute(this, enemy);
+
+        attackStateEndTime = System.currentTimeMillis() + ATTACK_ANIMATION_DURATION;
+
+        setState(AnimationState.ATTACK);
+    }
+
+    public void performSpecial(Fighter enemy) {
+
+        lastSpecialTime = System.currentTimeMillis();
+
+        specialAttack.execute(this, enemy);
+
+            if (specialFrames != null && !specialFrames.isEmpty()) {
+
+        animationPlayer.play(specialFrames, 90);
+
+        specialStateEndTime =
+                System.currentTimeMillis() + SPECIAL_ANIMATION_DURATION;
+
+        currentState = AnimationState.SPECIAL;
+
+        return;
+    }
+
+    // SPECIAL TIPO TRANSFORMACIÓN
+    if (specialAnimations != null && !specialAnimations.isEmpty()) {
+
+        transformed = !transformed;
+
+        playAnimation(AnimationState.IDLE);
+    }
+    }
+
+    public void damage(int amount) {
+
+        if (invulnerable) return;
+
+        health -= amount;
+
+        if (health < 0) health = 0;
+
+        hitStateEndTime = System.currentTimeMillis() + HIT_ANIMATION_DURATION;
+
+        setState(AnimationState.HIT);
+    }
+
+    public void moveLeft() {
+
+        node.setTranslateX(node.getTranslateX() - speed);
+
+        movedThisFrame = true;
+
+        facingRight = false;
+
+        sprite.setScaleX(-1);
+    }
+
+    public void moveRight() {
+
+        node.setTranslateX(node.getTranslateX() + speed);
+
+        movedThisFrame = true;
+
+        facingRight = true;
+
+        sprite.setScaleX(1);
+    }
+
+    public void setState(AnimationState newState) {
+
+        if (currentState == newState) return;
+
+        currentState = newState;
+
+        playAnimation(newState);
+    }
+
+// --- MÉTODOS COMPATIBLES CON EL RESTO DEL ENGINE ---
+
+public void setX(double x) {
+    node.setTranslateX(x);
+}
+
+public int getHealth() {
+    return health;
+}
+
+public boolean canAttack() {
+    long now = System.currentTimeMillis();
+    return now - lastAttackTime >= GameConfig.ATTACK_COOLDOWN;
+}
+
+public boolean canSpecial() {
+    long now = System.currentTimeMillis();
+    return now - lastSpecialTime >= GameConfig.SPECIAL_COOLDOWN;
+}
+
+public boolean isNear(Fighter other) {
+    double distance = Math.abs(getX() - other.getX());
+    return distance < GameConfig.ATTACK_RANGE;
+}
+
+public boolean isFacing(Fighter other) {
+
+    double otherX = other.getX();
+
+    if (otherX > getX()) {
+        return facingRight;
+    } else {
+        return !facingRight;
+    }
+}
+
+public void applyKnockback(Fighter attacker, int force) {
+
+    if (attacker.getX() < this.getX()) {
+        node.setTranslateX(node.getTranslateX() + force);
+    } else {
+        node.setTranslateX(node.getTranslateX() - force);
+    }
+}
+
+public void setColor(Color color) {
+
+    sprite.setStyle(
+        "-fx-effect: dropshadow(gaussian, " +
+        "rgba(" +
+        (int)(color.getRed()*255) + "," +
+        (int)(color.getGreen()*255) + "," +
+        (int)(color.getBlue()*255) + ",0.8)," +
+        "20,0.7,0,0)"
+    );
+}
+
+public void resetColor() {
+    sprite.setStyle(null);
+}
+
+public Color getOriginalColor() {
+    return Color.WHITE;
+}
+
+public void setInvulnerable(boolean value) {
+    invulnerable = value;
+}
+
+    public void update() {
+
+        long now = System.currentTimeMillis();
+
+        if (currentState == AnimationState.HIT && now >= hitStateEndTime) {
+
+            setState(AnimationState.IDLE);
+
+        }
+
+        else if (currentState == AnimationState.ATTACK && now >= attackStateEndTime) {
+
+            setState(AnimationState.IDLE);
+
+        }
+
+        else if (currentState == AnimationState.SPECIAL && now >= specialStateEndTime) {
+
+            setState(AnimationState.IDLE);
+
+        }
+
+        else if (currentState != AnimationState.ATTACK &&
+                 currentState != AnimationState.HIT &&
+                 currentState != AnimationState.SPECIAL) {
+
+            if (movedThisFrame) {
+
+                setState(AnimationState.WALK);
+
+            } else {
+
+                setState(AnimationState.IDLE);
+
+            }
+
+        }
+
+        animationPlayer.update();
+
+        movedThisFrame = false;
     }
 
     public Group getNode() {
         return node;
     }
 
-    public ImageView getSprite() {
-        return sprite;
-    }
-
     public double getX() {
         return node.getTranslateX();
-    }
-
-    public void setX(double x) {
-        node.setTranslateX(x);
-    }
-
-    public int getHealth() {
-        return health;
     }
 
     public boolean isDead() {
         return health <= 0;
     }
 
-    public boolean isInvulnerable() {
-        return invulnerable;
-    }
-
-    public void setInvulnerable(boolean value) {
-        invulnerable = value;
-    }
-
     public boolean isFacingRight() {
         return facingRight;
-    }
-
-    public void setFacingRight(boolean facingRight) {
-        this.facingRight = facingRight;
-
-        if (facingRight) {
-            sprite.setScaleX(1);
-        } else {
-            sprite.setScaleX(-1);
-        }
-    }
-
-    public void moveLeft() {
-        node.setTranslateX(node.getTranslateX() - speed);
-        movedThisFrame = true;
-        setFacingRight(false);
-    }
-
-    public void moveRight() {
-        node.setTranslateX(node.getTranslateX() + speed);
-        movedThisFrame = true;
-        setFacingRight(true);
-    }
-
-    public boolean isFacing(Fighter other) {
-        double otherX = other.getX();
-
-        if (otherX > getX()) {
-            return facingRight;
-        } else {
-            return !facingRight;
-        }
-    }
-
-    public boolean isNear(Fighter other) {
-        double distance = Math.abs(getX() - other.getX());
-        return distance < GameConfig.ATTACK_RANGE;
-    }
-
-    public boolean canAttack() {
-        long now = System.currentTimeMillis();
-        return now - lastAttackTime >= GameConfig.ATTACK_COOLDOWN;
-    }
-
-    public boolean canSpecial() {
-        long now = System.currentTimeMillis();
-        return now - lastSpecialTime >= GameConfig.SPECIAL_COOLDOWN;
-    }
-
-    public void performAttack(Fighter enemy) {
-        lastAttackTime = System.currentTimeMillis();
-        normalAttack.execute(this, enemy);
-
-        attackStateEndTime = System.currentTimeMillis() + ATTACK_ANIMATION_DURATION;
-        setState(AnimationState.ATTACK);
-    }
-
-    public void performSpecial(Fighter enemy) {
-        lastSpecialTime = System.currentTimeMillis();
-        specialAttack.execute(this, enemy);
-    }
-
-    public void damage(int amount) {
-        if (invulnerable) return;
-
-        if (health <= GameConfig.PLAYER_MAX_HEALTH * GameConfig.CRITICAL_HEALTH_THRESHOLD) {
-            amount = (int) (amount * 1.5);
-        }
-
-        health -= amount;
-
-        if (health < 0) health = 0;
-
-        flashEndTime = System.currentTimeMillis() + GameConfig.DAMAGE_FLASH;
-        hitStateEndTime = System.currentTimeMillis() + HIT_ANIMATION_DURATION;
-        setState(AnimationState.HIT);
-    }
-
-    public void applyKnockback(Fighter attacker, double force) {
-        if (attacker.getX() < this.getX()) {
-            node.setTranslateX(node.getTranslateX() + force);
-        } else {
-            node.setTranslateX(node.getTranslateX() - force);
-        }
-    }
-
-    public void setState(AnimationState newState) {
-        if (currentState == newState) return;
-
-        currentState = newState;
-
-        switch (newState) {
-            case IDLE:
-                if (idleFrames != null && !idleFrames.isEmpty()) {
-                    animationPlayer.play(idleFrames, 150);
-                }
-                break;
-
-            case WALK:
-                if (walkFrames != null && !walkFrames.isEmpty()) {
-                    animationPlayer.play(walkFrames, 120);
-                }
-                break;
-
-            case ATTACK:
-                if (attackFrames != null && !attackFrames.isEmpty()) {
-                    animationPlayer.play(attackFrames, 80);
-                }
-                break;
-
-            case HIT:
-                if (hitFrames != null && !hitFrames.isEmpty()) {
-                    animationPlayer.play(hitFrames, 100);
-                }
-                break;
-
-            case SPECIAL:
-                break;
-        }
-    }
-
-    public AnimationState getState() {
-        return currentState;
-    }
-
-    public void setColor(Color color) {
-        sprite.setOpacity(1);
-        sprite.setStyle("-fx-effect: dropshadow(gaussian, " + toRgbString(color) + ", 20, 0.7, 0, 0);");
-    }
-
-    public void resetColor() {
-        sprite.setStyle(null);
-    }
-
-    public Color getOriginalColor() {
-        return originalColor;
-    }
-
-    private String toRgbString(Color color) {
-        return "rgba(" +
-                (int) (color.getRed() * 255) + "," +
-                (int) (color.getGreen() * 255) + "," +
-                (int) (color.getBlue() * 255) + ",0.8)";
-    }
-
-    public void update() {
-        long now = System.currentTimeMillis();
-
-        if (flashEndTime > 0 && now > flashEndTime) {
-            flashEndTime = 0;
-        }
-
-        if (specialAttack != null) {
-            specialAttack.update(this);
-        }
-
-        if (currentState == AnimationState.HIT && now >= hitStateEndTime) {
-            setState(AnimationState.IDLE);
-        } else if (currentState == AnimationState.ATTACK && now >= attackStateEndTime) {
-            setState(AnimationState.IDLE);
-        } else if (currentState != AnimationState.ATTACK && currentState != AnimationState.HIT) {
-            if (movedThisFrame) {
-                setState(AnimationState.WALK);
-            } else {
-                setState(AnimationState.IDLE);
-            }
-        }
-
-        animationPlayer.update();
-        movedThisFrame = false;
     }
 }

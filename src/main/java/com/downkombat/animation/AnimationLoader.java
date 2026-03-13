@@ -2,7 +2,10 @@ package com.downkombat.animation;
 
 import javafx.scene.image.Image;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +16,10 @@ public class AnimationLoader {
 
         Map<AnimationState, List<Image>> animations = new HashMap<>();
 
-        loadAnimation(animations, AnimationState.IDLE, basePath + "/idle", "idle");
-        loadAnimation(animations, AnimationState.WALK, basePath + "/walk", "walk");
-        loadAnimation(animations, AnimationState.ATTACK, basePath + "/attack", "attack");
-        loadAnimation(animations, AnimationState.HIT, basePath + "/hit", "hit");
+        loadAnimation(animations, AnimationState.IDLE, basePath + "/idle");
+        loadAnimation(animations, AnimationState.WALK, basePath + "/walk");
+        loadAnimation(animations, AnimationState.ATTACK, basePath + "/attack");
+        loadAnimation(animations, AnimationState.HIT, basePath + "/hit");
 
         return animations;
     }
@@ -24,26 +27,76 @@ public class AnimationLoader {
     private static void loadAnimation(
             Map<AnimationState, List<Image>> map,
             AnimationState state,
-            String folder,
-            String prefix
+            String folderPath
     ) {
+
+        try {
+
+            URL url = AnimationLoader.class.getResource(folderPath);
+
+            if (url == null) return;
+
+            File folder = new File(url.toURI());
+
+            File[] files = folder.listFiles((dir, name) ->
+                    name.toLowerCase().endsWith(".png")
+            );
+
+            if (files == null) return;
+
+            Arrays.sort(files, (a, b) ->
+                    a.getName().compareToIgnoreCase(b.getName())
+            );
+
+            List<Image> frames = new ArrayList<>();
+
+            for (File file : files) {
+                frames.add(new Image(file.toURI().toString()));
+            }
+
+            if (!frames.isEmpty()) {
+                map.put(state, frames);
+            }
+
+        } catch (Exception e) {
+
+            System.out.println("Failed loading animation: " + folderPath);
+
+        }
+    }
+
+    public static List<Image> loadSpecial(String folderPath) {
 
         List<Image> frames = new ArrayList<>();
 
-        for (int i = 1; i <= 20; i++) {
+        try {
 
-            String path = folder + "/" + prefix + "_" + i + ".png";
-            var url = AnimationLoader.class.getResource(path);
+            URL url = AnimationLoader.class.getResource(folderPath);
 
-            if (url == null) {
-                break;
+            if (url == null) return frames;
+
+            File folder = new File(url.toURI());
+
+            File[] files = folder.listFiles((dir, name) ->
+                    name.toLowerCase().endsWith(".png")
+            );
+
+            if (files == null) return frames;
+
+            Arrays.sort(files, (a, b) ->
+                    a.getName().compareToIgnoreCase(b.getName())
+            );
+
+            for (File file : files) {
+                frames.add(new Image(file.toURI().toString()));
             }
 
-            frames.add(new Image(url.toExternalForm()));
+        } catch (Exception e) {
+
+            System.out.println("Failed loading special animation: " + folderPath);
+
         }
 
-        if (!frames.isEmpty()) {
-            map.put(state, frames);
-        }
+        return frames;
     }
 }
