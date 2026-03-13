@@ -2,18 +2,22 @@ package com.downkombat.fighters;
 
 import com.downkombat.combat.SpecialAttack;
 import com.downkombat.config.GameConfig;
+import com.downkombat.animation.AnimationState;
+
 import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 public class Fighter {
 
     private Group node;
-    private Rectangle sprite;
+    private ImageView sprite;
 
     private double speed = GameConfig.PLAYER_SPEED;
-
     private int health = GameConfig.PLAYER_MAX_HEALTH;
+
+    private AnimationState currentState = AnimationState.IDLE;
 
     private boolean facingRight = true;
 
@@ -27,11 +31,10 @@ public class Fighter {
     private Color currentColor;
 
     private long flashEndTime = 0;
-
     private boolean invulnerable = false;
 
-    private static final double WIDTH = 125;
-    private static final double HEIGHT = 250;
+    // altura real del personaje en pantalla
+    private static final double SPRITE_HEIGHT = 600;
 
     public Fighter(double x, double groundY, Color color,
                    SpecialAttack normalAttack,
@@ -42,48 +45,44 @@ public class Fighter {
 
         node = new Group();
 
-        sprite = new Rectangle(WIDTH, HEIGHT);
-        sprite.setFill(color);
+        Image image = new Image(
+                Fighter.class.getResource("/sprites/fighters/antonio/antonio.png").toExternalForm()
+        );
 
-        sprite.setTranslateX(-WIDTH / 2);
-        sprite.setTranslateY(-HEIGHT);
+        sprite = new ImageView(image);
+
+        // pixel art limpio
+        sprite.setSmooth(false);
+
+        // tamaño real del sprite
+        sprite.setFitHeight(SPRITE_HEIGHT);
+        sprite.setPreserveRatio(true);
+
+        // pivot en los pies del personaje (más estable)
+        sprite.setTranslateX(-image.getWidth() / 2);
+        sprite.setTranslateY(-image.getHeight());
 
         node.getChildren().add(sprite);
 
         node.setTranslateX(x);
         node.setTranslateY(groundY);
 
-        // orientar sprite según posición inicial
-       if (x > GameConfig.WIDTH / 2) {
-           facingRight = false;
-           sprite.setScaleX(-1);
-       } else {
-           facingRight = true;
-           sprite.setScaleX(1);
-       }
+        // orientación inicial
+        if (x > GameConfig.WIDTH / 2) {
+            facingRight = false;
+            sprite.setScaleX(-1);
+        }
 
         originalColor = color;
         currentColor = color;
     }
 
-    public void setInvulnerable(boolean value) {
-        invulnerable = value;
-    }
-
-    public boolean isInvulnerable() {
-        return invulnerable;
-    }
-
-    public void resetColor() {
-        sprite.setFill(originalColor);
-    }
-
-    public Color getOriginalColor() {
-        return originalColor;
-    }
-
     public Group getNode() {
         return node;
+    }
+
+    public ImageView getSprite() {
+        return sprite;
     }
 
     public double getX() {
@@ -102,20 +101,41 @@ public class Fighter {
         return health <= 0;
     }
 
+    public boolean isInvulnerable() {
+        return invulnerable;
+    }
+
+    public void setInvulnerable(boolean value) {
+        invulnerable = value;
+    }
+
+    public boolean isFacingRight() {
+        return facingRight;
+    }
+
+    public void setFacingRight(boolean facingRight) {
+
+        this.facingRight = facingRight;
+
+        if (facingRight) {
+            sprite.setScaleX(1);
+        } else {
+            sprite.setScaleX(-1);
+        }
+    }
+
     public void moveLeft() {
 
         node.setTranslateX(node.getTranslateX() - speed);
 
-        facingRight = false;
-        sprite.setScaleX(-1);
+        setFacingRight(false);
     }
 
     public void moveRight() {
 
         node.setTranslateX(node.getTranslateX() + speed);
 
-        facingRight = true;
-        sprite.setScaleX(1);
+        setFacingRight(true);
     }
 
     public boolean isFacing(Fighter other) {
@@ -132,55 +152,44 @@ public class Fighter {
     public boolean isNear(Fighter other) {
 
         double distance = Math.abs(getX() - other.getX());
-
         return distance < GameConfig.ATTACK_RANGE;
     }
 
     public boolean canAttack() {
 
         long now = System.currentTimeMillis();
-
         return now - lastAttackTime >= GameConfig.ATTACK_COOLDOWN;
     }
 
     public boolean canSpecial() {
 
         long now = System.currentTimeMillis();
-
         return now - lastSpecialTime >= GameConfig.SPECIAL_COOLDOWN;
     }
 
     public void performAttack(Fighter enemy) {
 
         lastAttackTime = System.currentTimeMillis();
-
         normalAttack.execute(this, enemy);
     }
 
     public void performSpecial(Fighter enemy) {
 
         lastSpecialTime = System.currentTimeMillis();
-
         specialAttack.execute(this, enemy);
     }
 
     public void damage(int amount) {
 
-        if (invulnerable) {
-            return;
-        }
+        if (invulnerable) return;
 
         if (health <= GameConfig.PLAYER_MAX_HEALTH * GameConfig.CRITICAL_HEALTH_THRESHOLD) {
-            amount = (int)(amount * 1.5);
+            amount = (int) (amount * 1.5);
         }
 
         health -= amount;
 
-        if (health < 0) {
-            health = 0;
-        }
-
-        sprite.setFill(Color.WHITE);
+        if (health < 0) health = 0;
 
         flashEndTime = System.currentTimeMillis() + GameConfig.DAMAGE_FLASH;
     }
@@ -188,28 +197,37 @@ public class Fighter {
     public void applyKnockback(Fighter attacker, double force) {
 
         if (attacker.getX() < this.getX()) {
-
             node.setTranslateX(node.getTranslateX() + force);
-
         } else {
-
             node.setTranslateX(node.getTranslateX() - force);
         }
     }
 
-    public void setColor(Color color) {
+    public void setState(AnimationState newState) {
 
+        if (currentState != newState) {
+            currentState = newState;
+        }
+    }
+
+    public AnimationState getState() {
+        return currentState;
+    }
+
+    public void setColor(Color color) {
         currentColor = color;
-        sprite.setFill(color);
+    }
+
+    public void resetColor() {
+        currentColor = originalColor;
     }
 
     public Color getColor() {
-
         return currentColor;
     }
 
-    public boolean isFacingRight() {
-        return facingRight;
+    public Color getOriginalColor() {
+        return originalColor;
     }
 
     public void update() {
@@ -217,9 +235,6 @@ public class Fighter {
         long now = System.currentTimeMillis();
 
         if (flashEndTime > 0 && now > flashEndTime) {
-
-            sprite.setFill(currentColor);
-
             flashEndTime = 0;
         }
 
