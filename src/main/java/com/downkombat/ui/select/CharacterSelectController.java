@@ -1,6 +1,7 @@
 package com.downkombat.ui.select;
 
 import com.downkombat.Main;
+import com.downkombat.ui.FontLoader;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,6 +13,8 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.text.Text;
+import javafx.animation.ScaleTransition;
+import javafx.util.Duration;
 
 public class CharacterSelectController {
 
@@ -32,34 +35,35 @@ public class CharacterSelectController {
 
     private void createScene() {
 
+        // ======== CARGAR FUENTE PIXEL ART ========
+        FontLoader.loadPixelFont();
+
         // ======== 1. BACKGROUND VIDEO ========
-        // Loads the video file from resources and prepares it as a looping background.
         Media media = new Media(getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm());
         MediaPlayer mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Infinite loop
-        mediaPlayer.setMute(true); // No sound (optional)
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        mediaPlayer.setMute(true);
         mediaPlayer.play();
 
-        // Displays the video stretched to fill the window.
         MediaView mediaView = new MediaView(mediaPlayer);
         mediaView.setFitWidth(800);
         mediaView.setFitHeight(600);
-        mediaView.setPreserveRatio(false); // Forces full-screen coverage
-
+        mediaView.setPreserveRatio(false);
 
         // ======== 2. MENU CONTENT ========
-        // Title changes depending on whether Player 1 or Player 2 is selecting.
         Text title = new Text(selectingPlayer1 ? "Selecciona Jugador 1" : "Selecciona Jugador 2");
-        title.setStyle("-fx-font-size: 32px; -fx-fill: white;");
+        title.setStyle(
+            "-fx-font-size: 32px;" +
+            "-fx-font-family: 'Press Start 2P';" +
+            "-fx-fill: white;"
+        );
 
-        // Grid layout for character buttons.
+        // ======== GRID DE PERSONAJES ========
         GridPane grid = new GridPane();
         grid.setHgap(20);
         grid.setVgap(20);
         grid.setAlignment(Pos.CENTER);
 
-        // Creates six character selection buttons.
-        // Each button now uses a SKIN from /character_sheet/film/frame/
         StackPane btn1 = createButton("marco_antonio");
         StackPane btn2 = createButton("marco_dario");
         StackPane btn3 = createButton("marco_juanma");
@@ -67,7 +71,6 @@ public class CharacterSelectController {
         StackPane btn5 = createButton("marco_pepe");
         StackPane btn6 = createButton("marco_soraya");
 
-        // Adds buttons to the grid.
         grid.add(btn1, 0, 0);
         grid.add(btn2, 1, 0);
         grid.add(btn3, 2, 0);
@@ -75,17 +78,12 @@ public class CharacterSelectController {
         grid.add(btn5, 1, 1);
         grid.add(btn6, 2, 1);
 
-        // Vertical layout containing the title and the grid.
         VBox content = new VBox(30, title, grid);
         content.setAlignment(Pos.CENTER);
 
-
-        // ======== 3. STACKPANE TO OVERLAY VIDEO + UI ========
-        // StackPane allows placing the UI on top of the background video.
         StackPane root = new StackPane();
         root.getChildren().addAll(mediaView, content);
 
-        // Creates the final scene.
         scene = new Scene(root, 800, 600);
     }
 
@@ -93,22 +91,17 @@ public class CharacterSelectController {
 
         String path = "/frame/" + characterName + ".png";
 
-        // Debug para ver si JavaFX encuentra la imagen
-        System.out.println("Buscando imagen: " + path);
         java.io.InputStream is = getClass().getResourceAsStream(path);
-        System.out.println("Resultado: " + is);
 
         if (is == null) {
             System.out.println("ERROR: No se encontró la imagen " + path);
         }
 
-        // Cargar imagen
         javafx.scene.image.Image img = new javafx.scene.image.Image(is);
         javafx.scene.image.ImageView frame = new javafx.scene.image.ImageView(img);
         frame.setFitWidth(120);
         frame.setFitHeight(120);
 
-        // Botón transparente encima
         Button btn = new Button();
         btn.setPrefSize(120, 120);
         btn.setStyle(
@@ -117,33 +110,47 @@ public class CharacterSelectController {
             "-fx-padding: 0;"
         );
 
+        // ======== ANIMACIONES RETRO ========
+
+        // Hover: crece suavemente
+        btn.setOnMouseEntered(e -> animateScale(btn, 1.0, 1.15, 120));
+        btn.setOnMouseExited(e -> animateScale(btn, 1.15, 1.0, 120));
+
+        // Click: se encoge rápido
+        btn.setOnMousePressed(e -> animateScale(btn, 1.15, 0.90, 80));
+
+        // Suelta: rebote suave
+        btn.setOnMouseReleased(e -> animateScale(btn, 0.90, 1.15, 120));
+
         btn.setOnAction(e -> selectCharacter(characterName));
 
-        // Superponer imagen + botón
         StackPane slot = new StackPane();
         slot.getChildren().addAll(frame, btn);
 
         return slot;
     }
 
-
-
-
-
-
+    // ======== MÉTODO DE ANIMACIÓN ========
+    private void animateScale(Button btn, double from, double to, int ms) {
+        ScaleTransition st = new ScaleTransition(Duration.millis(ms), btn);
+        st.setFromX(from);
+        st.setFromY(from);
+        st.setToX(to);
+        st.setToY(to);
+        st.play();
+    }
 
     private void selectCharacter(String characterName) {
-        // Saves the selected character depending on which player is choosing.
         if (selectingPlayer1) {
             player1 = characterName;
-            main.showSelectP2(); // Moves to Player 2 selection screen.
+            main.showSelectP2();
         } else {
             player2 = characterName;
-            main.startGame(player1, player2); // Starts the game with both characters.
+            main.startGame(player1, player2);
         }
     }
 
     public Scene getScene() {
-        return scene; // Returns the fully built scene.
+        return scene;
     }
 }
