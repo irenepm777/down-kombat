@@ -126,12 +126,6 @@ public class CharacterSelectController {
         return slot;
     }
 
-
-
-
-
-
-
     private void selectCharacter(String characterName) {
         // Saves the selected character depending on which player is choosing.
         if (selectingPlayer1) {
