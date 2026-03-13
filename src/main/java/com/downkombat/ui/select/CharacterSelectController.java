@@ -91,19 +91,26 @@ public class CharacterSelectController {
 
     private StackPane createButton(String characterName) {
 
-        // ======== 1. Imagen del marco ========
-        javafx.scene.image.Image img = new javafx.scene.image.Image(
-            getClass().getResourceAsStream("/frame/" + characterName + ".png")
-        );
+        String path = "/frame/" + characterName + ".png";
 
+        // Debug para ver si JavaFX encuentra la imagen
+        System.out.println("Buscando imagen: " + path);
+        java.io.InputStream is = getClass().getResourceAsStream(path);
+        System.out.println("Resultado: " + is);
+
+        if (is == null) {
+            System.out.println("ERROR: No se encontró la imagen " + path);
+        }
+
+        // Cargar imagen
+        javafx.scene.image.Image img = new javafx.scene.image.Image(is);
         javafx.scene.image.ImageView frame = new javafx.scene.image.ImageView(img);
         frame.setFitWidth(120);
         frame.setFitHeight(120);
 
-        // ======== 2. Botón transparente encima ========
+        // Botón transparente encima
         Button btn = new Button();
         btn.setPrefSize(120, 120);
-
         btn.setStyle(
             "-fx-background-color: transparent;" +
             "-fx-border-color: transparent;" +
@@ -112,12 +119,13 @@ public class CharacterSelectController {
 
         btn.setOnAction(e -> selectCharacter(characterName));
 
-        // ======== 3. StackPane para superponer marco + botón ========
+        // Superponer imagen + botón
         StackPane slot = new StackPane();
         slot.getChildren().addAll(frame, btn);
 
         return slot;
     }
+
 
 
 
