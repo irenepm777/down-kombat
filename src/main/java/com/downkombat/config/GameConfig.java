@@ -15,7 +15,7 @@ public class GameConfig {
 
     // POSICIÓN DEL SUELO
 
-    public static final int GROUND_Y = 650;
+    public static final int GROUND_Y = 800;
 
 
     //  JUGADOR
