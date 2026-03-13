@@ -3,16 +3,21 @@ package com.downkombat.fighters;
 import com.downkombat.combat.SpecialAttack;
 import com.downkombat.config.GameConfig;
 import com.downkombat.animation.AnimationState;
+import com.downkombat.animation.AnimationPlayer;
+import com.downkombat.animation.AnimationLoader;
 
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 
+import java.util.List;
+
 public class Fighter {
 
     private Group node;
     private ImageView sprite;
+    private AnimationPlayer animationPlayer;
 
     private double speed = GameConfig.PLAYER_SPEED;
     private int health = GameConfig.PLAYER_MAX_HEALTH;
@@ -33,7 +38,6 @@ public class Fighter {
     private long flashEndTime = 0;
     private boolean invulnerable = false;
 
-    // altura real del personaje en pantalla
     private static final double SPRITE_HEIGHT = 600;
 
     public Fighter(double x, double groundY, Color color,
@@ -45,20 +49,18 @@ public class Fighter {
 
         node = new Group();
 
+        // sprite base
         Image image = new Image(
                 Fighter.class.getResource("/sprites/fighters/antonio/antonio.png").toExternalForm()
         );
 
         sprite = new ImageView(image);
 
-        // pixel art limpio
         sprite.setSmooth(false);
 
-        // tamaño real del sprite
         sprite.setFitHeight(SPRITE_HEIGHT);
         sprite.setPreserveRatio(true);
 
-        // pivot en los pies del personaje (más estable)
         sprite.setTranslateX(-image.getWidth() / 2);
         sprite.setTranslateY(-image.getHeight());
 
@@ -67,14 +69,33 @@ public class Fighter {
         node.setTranslateX(x);
         node.setTranslateY(groundY);
 
-        // orientación inicial
         if (x > GameConfig.WIDTH / 2) {
             facingRight = false;
             sprite.setScaleX(-1);
         }
 
+        // colores
         originalColor = color;
         currentColor = color;
+
+        // inicializar animation player
+        animationPlayer = new AnimationPlayer(sprite);
+
+        // cargar animación idle
+        try {
+
+            List<Image> idleFrames = AnimationLoader.load(
+                    "/sprites/fighters/antonio/idle",
+                    4
+            );
+
+            animationPlayer.play(idleFrames, 150);
+
+        } catch (Exception e) {
+
+            System.out.println("Idle animation not found, using static sprite.");
+
+        }
     }
 
     public Group getNode() {
@@ -240,6 +261,10 @@ public class Fighter {
 
         if (specialAttack != null) {
             specialAttack.update(this);
+        }
+
+        if (animationPlayer != null) {
+            animationPlayer.update();
         }
     }
 }
