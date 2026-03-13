@@ -1,10 +1,10 @@
 package com.downkombat.fighters;
 
+import com.downkombat.animation.AnimationLoader;
+import com.downkombat.animation.AnimationPlayer;
+import com.downkombat.animation.AnimationState;
 import com.downkombat.combat.SpecialAttack;
 import com.downkombat.config.GameConfig;
-import com.downkombat.animation.AnimationState;
-import com.downkombat.animation.AnimationPlayer;
-import com.downkombat.animation.AnimationLoader;
 
 import javafx.scene.Group;
 import javafx.scene.image.Image;
@@ -23,6 +23,8 @@ public class Fighter {
 
     private List<Image> idleFrames;
     private List<Image> walkFrames;
+    private List<Image> attackFrames;
+    private List<Image> hitFrames;
 
     private double speed = GameConfig.PLAYER_SPEED;
     private int health = GameConfig.PLAYER_MAX_HEALTH;
@@ -30,20 +32,25 @@ public class Fighter {
     private AnimationState currentState = AnimationState.IDLE;
 
     private boolean facingRight = true;
+    private boolean invulnerable = false;
+    private boolean movedThisFrame = false;
 
     private SpecialAttack normalAttack;
     private SpecialAttack specialAttack;
 
     private long lastAttackTime = 0;
     private long lastSpecialTime = 0;
+    private long flashEndTime = 0;
+
+    private long attackStateEndTime = 0;
+    private long hitStateEndTime = 0;
 
     private Color originalColor;
     private Color currentColor;
 
-    private long flashEndTime = 0;
-    private boolean invulnerable = false;
-
     private static final double SPRITE_HEIGHT = 600;
+    private static final long ATTACK_ANIMATION_DURATION = 220;
+    private static final long HIT_ANIMATION_DURATION = 180;
 
     public Fighter(
             String fighterId,
@@ -53,9 +60,7 @@ public class Fighter {
             SpecialAttack normalAttack,
             SpecialAttack specialAttack
     ) {
-
         this.fighterId = fighterId;
-
         this.normalAttack = normalAttack;
         this.specialAttack = specialAttack;
 
@@ -63,18 +68,18 @@ public class Fighter {
 
         Image image = new Image(
                 Fighter.class.getResource(
-                        "/sprites/fighters/" + fighterId + "/" + fighterId + ".png"
+                        "/sprites/fighters/" + fighterId + "/idle/idle_1.png"
                 ).toExternalForm()
         );
 
         sprite = new ImageView(image);
-
         sprite.setSmooth(false);
+        sprite.setCache(true);
         sprite.setFitHeight(SPRITE_HEIGHT);
         sprite.setPreserveRatio(true);
 
-        sprite.setTranslateX(-image.getWidth() / 2);
-        sprite.setTranslateY(-image.getHeight());
+        sprite.setTranslateX(-sprite.getFitWidth() / 2);
+        sprite.setTranslateY(-SPRITE_HEIGHT);
 
         node.getChildren().add(sprite);
 
@@ -92,23 +97,20 @@ public class Fighter {
         animationPlayer = new AnimationPlayer(sprite);
 
         try {
-
-            idleFrames = AnimationLoader.load(
-                    "/sprites/fighters/" + fighterId + "/idle",
-                    4
+            var animations = AnimationLoader.load(
+                    "/sprites/fighters/" + fighterId
             );
 
-            walkFrames = AnimationLoader.load(
-                    "/sprites/fighters/" + fighterId + "/walk",
-                    4
-            );
+            idleFrames = animations.get(AnimationState.IDLE);
+            walkFrames = animations.get(AnimationState.WALK);
+            attackFrames = animations.get(AnimationState.ATTACK);
+            hitFrames = animations.get(AnimationState.HIT);
 
-            animationPlayer.play(idleFrames, 150);
-
+            if (idleFrames != null && !idleFrames.isEmpty()) {
+                animationPlayer.play(idleFrames, 150);
+            }
         } catch (Exception e) {
-
             System.out.println("Animation load failed for " + fighterId);
-
         }
     }
 
@@ -149,7 +151,6 @@ public class Fighter {
     }
 
     public void setFacingRight(boolean facingRight) {
-
         this.facingRight = facingRight;
 
         if (facingRight) {
@@ -160,23 +161,18 @@ public class Fighter {
     }
 
     public void moveLeft() {
-
         node.setTranslateX(node.getTranslateX() - speed);
-
+        movedThisFrame = true;
         setFacingRight(false);
-        setState(AnimationState.WALK);
     }
 
     public void moveRight() {
-
         node.setTranslateX(node.getTranslateX() + speed);
-
+        movedThisFrame = true;
         setFacingRight(true);
-        setState(AnimationState.WALK);
     }
 
     public boolean isFacing(Fighter other) {
-
         double otherX = other.getX();
 
         if (otherX > getX()) {
@@ -187,37 +183,34 @@ public class Fighter {
     }
 
     public boolean isNear(Fighter other) {
-
         double distance = Math.abs(getX() - other.getX());
         return distance < GameConfig.ATTACK_RANGE;
     }
 
     public boolean canAttack() {
-
         long now = System.currentTimeMillis();
         return now - lastAttackTime >= GameConfig.ATTACK_COOLDOWN;
     }
 
     public boolean canSpecial() {
-
         long now = System.currentTimeMillis();
         return now - lastSpecialTime >= GameConfig.SPECIAL_COOLDOWN;
     }
 
     public void performAttack(Fighter enemy) {
-
         lastAttackTime = System.currentTimeMillis();
         normalAttack.execute(this, enemy);
+
+        attackStateEndTime = System.currentTimeMillis() + ATTACK_ANIMATION_DURATION;
+        setState(AnimationState.ATTACK);
     }
 
     public void performSpecial(Fighter enemy) {
-
         lastSpecialTime = System.currentTimeMillis();
         specialAttack.execute(this, enemy);
     }
 
     public void damage(int amount) {
-
         if (invulnerable) return;
 
         if (health <= GameConfig.PLAYER_MAX_HEALTH * GameConfig.CRITICAL_HEALTH_THRESHOLD) {
@@ -229,10 +222,11 @@ public class Fighter {
         if (health < 0) health = 0;
 
         flashEndTime = System.currentTimeMillis() + GameConfig.DAMAGE_FLASH;
+        hitStateEndTime = System.currentTimeMillis() + HIT_ANIMATION_DURATION;
+        setState(AnimationState.HIT);
     }
 
     public void applyKnockback(Fighter attacker, double force) {
-
         if (attacker.getX() < this.getX()) {
             node.setTranslateX(node.getTranslateX() + force);
         } else {
@@ -241,19 +235,36 @@ public class Fighter {
     }
 
     public void setState(AnimationState newState) {
-
         if (currentState == newState) return;
 
         currentState = newState;
 
         switch (newState) {
-
             case IDLE:
-                animationPlayer.play(idleFrames, 150);
+                if (idleFrames != null && !idleFrames.isEmpty()) {
+                    animationPlayer.play(idleFrames, 150);
+                }
                 break;
 
             case WALK:
-                animationPlayer.play(walkFrames, 120);
+                if (walkFrames != null && !walkFrames.isEmpty()) {
+                    animationPlayer.play(walkFrames, 120);
+                }
+                break;
+
+            case ATTACK:
+                if (attackFrames != null && !attackFrames.isEmpty()) {
+                    animationPlayer.play(attackFrames, 80);
+                }
+                break;
+
+            case HIT:
+                if (hitFrames != null && !hitFrames.isEmpty()) {
+                    animationPlayer.play(hitFrames, 100);
+                }
+                break;
+
+            case SPECIAL:
                 break;
         }
     }
@@ -262,8 +273,27 @@ public class Fighter {
         return currentState;
     }
 
-    public void update() {
+    public void setColor(Color color) {
+        sprite.setOpacity(1);
+        sprite.setStyle("-fx-effect: dropshadow(gaussian, " + toRgbString(color) + ", 20, 0.7, 0, 0);");
+    }
 
+    public void resetColor() {
+        sprite.setStyle(null);
+    }
+
+    public Color getOriginalColor() {
+        return originalColor;
+    }
+
+    private String toRgbString(Color color) {
+        return "rgba(" +
+                (int) (color.getRed() * 255) + "," +
+                (int) (color.getGreen() * 255) + "," +
+                (int) (color.getBlue() * 255) + ",0.8)";
+    }
+
+    public void update() {
         long now = System.currentTimeMillis();
 
         if (flashEndTime > 0 && now > flashEndTime) {
@@ -274,10 +304,19 @@ public class Fighter {
             specialAttack.update(this);
         }
 
-        animationPlayer.update();
-
-        if (currentState == AnimationState.WALK) {
+        if (currentState == AnimationState.HIT && now >= hitStateEndTime) {
             setState(AnimationState.IDLE);
+        } else if (currentState == AnimationState.ATTACK && now >= attackStateEndTime) {
+            setState(AnimationState.IDLE);
+        } else if (currentState != AnimationState.ATTACK && currentState != AnimationState.HIT) {
+            if (movedThisFrame) {
+                setState(AnimationState.WALK);
+            } else {
+                setState(AnimationState.IDLE);
+            }
         }
+
+        animationPlayer.update();
+        movedThisFrame = false;
     }
 }

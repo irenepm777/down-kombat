@@ -2,45 +2,48 @@ package com.downkombat.animation;
 
 import javafx.scene.image.Image;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AnimationLoader {
 
-    private static final String BASE_PATH = "/sprites/fighters/";
+    public static Map<AnimationState, List<Image>> load(String basePath) {
 
-    public static Map<AnimationState, List<Image>> load(String fighter) {
+        Map<AnimationState, List<Image>> animations = new HashMap<>();
 
-        Map<AnimationState, List<Image>> animations = new EnumMap<>(AnimationState.class);
-
-        loadState(animations, fighter, AnimationState.IDLE, "idle", 4);
-        loadState(animations, fighter, AnimationState.WALK, "walk", 3);
-        loadState(animations, fighter, AnimationState.ATTACK, "attack", 4);
-        loadState(animations, fighter, AnimationState.HIT, "hit", 2);
+        loadAnimation(animations, AnimationState.IDLE, basePath + "/idle", "idle");
+        loadAnimation(animations, AnimationState.WALK, basePath + "/walk", "walk");
+        loadAnimation(animations, AnimationState.ATTACK, basePath + "/attack", "attack");
+        loadAnimation(animations, AnimationState.HIT, basePath + "/hit", "hit");
 
         return animations;
     }
 
-    private static void loadState(
-            Map<AnimationState, List<Image>> animations,
-            String fighter,
+    private static void loadAnimation(
+            Map<AnimationState, List<Image>> map,
             AnimationState state,
             String folder,
-            int frames
+            String prefix
     ) {
 
-        List<Image> images = new ArrayList<>();
+        List<Image> frames = new ArrayList<>();
 
-        for (int i = 1; i <= frames; i++) {
+        for (int i = 1; i <= 20; i++) {
 
-            String path = BASE_PATH + fighter + "/" + folder + "_" + i + ".PNG";
+            String path = folder + "/" + prefix + "_" + i + ".png";
+            var url = AnimationLoader.class.getResource(path);
 
-            Image img = new Image(
-                    AnimationLoader.class.getResource(path).toExternalForm()
-            );
+            if (url == null) {
+                break;
+            }
 
-            images.add(img);
+            frames.add(new Image(url.toExternalForm()));
         }
 
-        animations.put(state, images);
+        if (!frames.isEmpty()) {
+            map.put(state, frames);
+        }
     }
 }
