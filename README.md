@@ -1,5 +1,9 @@
 # down-kombat
-DOWN KOMBAT es un videojuego de lucha 2D en tiempo real desarrollado en Java + JavaFX como proyecto final de DAW, aplicando modelado UML, control de versiones con GitFlow y análisis de calidad del código.
+Down Kombat is a 2D fighting game developed in Java using JavaFX.
+The project was created as part of a programming assignment and implements a basic fighting game architecture including character selection, combat mechanics, animations and special abilities.
+The objective of the project was to design and implement a small but complete game using object-oriented programming principles and modular architecture.
+
+
 DIAGRAMA DE CLASES
 ```mermaid
 classDiagram
