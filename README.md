@@ -109,3 +109,23 @@ Atacar -. include .-> ReproducirSonido
 AtaqueEspecial -. extend .-> Atacar
 
 ```
+
+DIAGRAMA DE SECUENCIA
+
+```mermaid
+sequenceDiagram
+actor Jugador
+participant GameScene
+participant FightManager
+participant Fighter as Atacante
+participant Fighter2 as Objetivo
+participant SoundManager
+
+Jugador ->> GameScene: pulsarBotonAtacar()
+GameScene ->> FightManager: procesarAtaque()
+FightManager ->> Atacante: getAttack()
+Atacante ->> Objetivo: execute(ataque)
+Objetivo ->> Objetivo: receiveDamage()
+FightManager ->> SoundManager: play("hit_sound")
+
+```
