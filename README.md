@@ -70,4 +70,42 @@ CharacterSelectScene --> FighterFactory
 
 
 ```
+Diagrama de Casos de Uso
 
+```mermaid
+flowchart LR
+
+%% Actores
+Jugador([Jugador])
+Motor(["Motor del Juego"])
+Audio(["Sistema de Audio"])
+
+%% Sistema
+subgraph DownKombat
+  IniciarPartida([Iniciar Partida])
+  SeleccionarPersonaje([Seleccionar Personaje])
+  Atacar([Atacar])
+  AtaqueEspecial([Ataque Especial])
+  GuardarProgreso([Guardar Progreso])
+  PausarJuego([Pausar Juego])
+  ReproducirSonido([Reproducir Sonido])
+end
+
+%% Relaciones actor - casos de uso
+Jugador --> IniciarPartida
+Jugador --> SeleccionarPersonaje
+Jugador --> Atacar
+Jugador --> AtaqueEspecial
+Jugador --> GuardarProgreso
+Jugador --> PausarJuego
+
+Motor --> Atacar
+Motor --> AtaqueEspecial
+
+Audio --> ReproducirSonido
+
+%% "include" y "extend" simulados
+Atacar -. include .-> ReproducirSonido
+AtaqueEspecial -. extend .-> Atacar
+
+```
