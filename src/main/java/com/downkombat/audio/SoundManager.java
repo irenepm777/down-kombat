@@ -58,15 +58,13 @@ public class SoundManager {
 
         });
     }
-    
+
     public static void pause() {
 
-		if (player != null) {
-			player.pause();
-		}
-	}
-    
-
+        if (player != null) {
+            player.pause();
+        }
+    }
 
     public static void stop() {
 

@@ -29,6 +29,9 @@ public class GameScene {
     private Fighter player1;
     private Fighter player2;
 
+    private CharacterType p1Type;
+    private CharacterType p2Type;
+
     private HealthBar healthBarP1;
     private HealthBar healthBarP2;
 
@@ -38,11 +41,13 @@ public class GameScene {
 
     private long freezeEndTime = 0;
 
-    // managers
     private ProjectileManager projectileManager;
     private CarManager carManager;
 
-    public GameScene() {
+    public GameScene(CharacterType p1Type, CharacterType p2Type) {
+
+        this.p1Type = p1Type;
+        this.p2Type = p2Type;
 
         root = new Group();
 
@@ -90,14 +95,14 @@ public class GameScene {
     private void spawnPlayers() {
 
         player1 = FighterFactory.create(
-                CharacterType.ANTONIO,
+                p1Type,
                 640 - 200,
                 projectileManager,
                 carManager
         );
 
         player2 = FighterFactory.create(
-                CharacterType.SORAYA,
+                p2Type,
                 640 + 200,
                 projectileManager,
                 carManager
@@ -113,9 +118,7 @@ public class GameScene {
 
         long now = System.currentTimeMillis();
 
-        if (now < freezeEndTime) {
-            return;
-        }
+        if (now < freezeEndTime) return;
 
         if (gameState == GameState.GAME_OVER) {
 
@@ -126,58 +129,52 @@ public class GameScene {
             return;
         }
 
-        // movimiento
+        // MOVIMIENTO
         if (input.isPressed(KeyCode.A)) player1.moveLeft();
         if (input.isPressed(KeyCode.D)) player1.moveRight();
 
         if (input.isPressed(KeyCode.LEFT)) player2.moveLeft();
         if (input.isPressed(KeyCode.RIGHT)) player2.moveRight();
 
-        // límites pantalla
-        if (player1.getX() < 60) player1.setX(60);
-        if (player1.getX() > GameConfig.WIDTH - 60) player1.setX(GameConfig.WIDTH - 60);
+        // LÍMITES
+        clampToScreen(player1);
+        clampToScreen(player2);
 
-        if (player2.getX() < 60) player2.setX(60);
-        if (player2.getX() > GameConfig.WIDTH - 60) player2.setX(GameConfig.WIDTH - 60);
-
-        // update fighters
+        // UPDATE FIGHTERS
         player1.update();
         player2.update();
 
-        // ATAQUES NORMALES
-        if (input.isPressed(KeyCode.F)) {
+        double distance = Math.abs(player1.getX() - player2.getX());
 
-            if (player1.canAttack() && player1.isNear(player2) && player1.isFacing(player2)) {
+        // ATAQUE PLAYER 1
+        if (input.isPressed(KeyCode.F)
+                && distance < GameConfig.ATTACK_RANGE
+                && player1.canAttack()) {
 
-                player1.performAttack(player2);
+            player1.performAttack(player2);
 
-                freezeEndTime = System.currentTimeMillis() + GameConfig.HIT_FREEZE;
-            }
+            freezeEndTime =
+                    System.currentTimeMillis() + GameConfig.HIT_FREEZE;
         }
 
-        if (input.isPressed(KeyCode.K)) {
+        // ATAQUE PLAYER 2
+        if (input.isPressed(KeyCode.K)
+                && distance < GameConfig.ATTACK_RANGE
+                && player2.canAttack()) {
 
-            if (player2.canAttack() && player2.isNear(player1) && player2.isFacing(player1)) {
+            player2.performAttack(player1);
 
-                player2.performAttack(player1);
-
-                freezeEndTime = System.currentTimeMillis() + GameConfig.HIT_FREEZE;
-            }
+            freezeEndTime =
+                    System.currentTimeMillis() + GameConfig.HIT_FREEZE;
         }
 
-        // ATAQUES ESPECIALES
-        if (input.isPressed(KeyCode.G)) {
-
-            if (player1.canSpecial()) {
-                player1.performSpecial(player2);
-            }
+        // ESPECIALES
+        if (input.isPressed(KeyCode.G) && player1.canSpecial()) {
+            player1.performSpecial(player2);
         }
 
-        if (input.isPressed(KeyCode.L)) {
-
-            if (player2.canSpecial()) {
-                player2.performSpecial(player1);
-            }
+        if (input.isPressed(KeyCode.L) && player2.canSpecial()) {
+            player2.performSpecial(player1);
         }
 
         // UPDATE PROYECTILES
@@ -187,11 +184,11 @@ public class GameScene {
         // UPDATE COCHES
         carManager.update();
 
-        // UI
+        // ACTUALIZAR VIDAS
         healthBarP1.update(player1.getHealth());
         healthBarP2.update(player2.getHealth());
 
-        // FIN COMBATE
+        // FIN DE COMBATE
         if (player1.isDead()) {
 
             winText.setText("PLAYER 2 WINS\nPress R to restart");
@@ -205,6 +202,15 @@ public class GameScene {
             winText.setVisible(true);
             gameState = GameState.GAME_OVER;
         }
+    }
+
+    private void clampToScreen(Fighter player) {
+
+        if (player.getX() < 60)
+            player.getNode().setTranslateX(60);
+
+        if (player.getX() > GameConfig.WIDTH - 60)
+            player.getNode().setTranslateX(GameConfig.WIDTH - 60);
     }
 
     private void resetFight() {

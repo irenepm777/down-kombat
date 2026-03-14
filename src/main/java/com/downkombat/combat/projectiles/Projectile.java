@@ -2,37 +2,53 @@ package com.downkombat.combat.projectiles;
 
 import com.downkombat.config.GameConfig;
 import com.downkombat.fighters.Fighter;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+
+import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class Projectile {
 
-    private Circle sprite;
+    private final Group node;
+    private final ImageView sprite;
 
-    private boolean movingRight;
-    private Fighter owner;
+    private final boolean movingRight;
+    private final Fighter owner;
 
     private boolean active = true;
 
     private static final double SPEED = 12;
-    private static final double HITBOX = 20; // tamaño de colisión real
+    private static final double HITBOX = 20;
 
     public Projectile(double x, double y, boolean movingRight, Fighter owner) {
 
         this.movingRight = movingRight;
         this.owner = owner;
 
-        sprite = new Circle(12);
-        sprite.setFill(Color.WHITE);
-        sprite.setStroke(Color.BLACK);
-        sprite.setStrokeWidth(2);
+        node = new Group();
 
-        sprite.setTranslateX(x);
-        sprite.setTranslateY(y);
+        Image image = new Image(
+                Projectile.class.getResource(
+                        "/sprites/projectiles/molar.png"
+                ).toExternalForm()
+        );
+
+        sprite = new ImageView(image);
+        sprite.setFitWidth(40);
+        sprite.setPreserveRatio(true);
+
+        if (!movingRight) {
+            sprite.setScaleX(-1);
+        }
+
+        node.getChildren().add(sprite);
+
+        node.setTranslateX(x);
+        node.setTranslateY(y);
     }
 
-    public Circle getNode() {
-        return sprite;
+    public Group getNode() {
+        return node;
     }
 
     public boolean isActive() {
@@ -43,35 +59,31 @@ public class Projectile {
 
         if (!active) return;
 
-        // mover proyectil
         if (movingRight) {
-            sprite.setTranslateX(sprite.getTranslateX() + SPEED);
+            node.setTranslateX(node.getTranslateX() + SPEED);
         } else {
-            sprite.setTranslateX(sprite.getTranslateX() - SPEED);
+            node.setTranslateX(node.getTranslateX() - SPEED);
         }
 
         checkCollision(enemy);
 
-        // destruir si sale de la pantalla
-        if (sprite.getTranslateX() < -50 || sprite.getTranslateX() > GameConfig.WIDTH + 50) {
+        if (node.getTranslateX() < -50 || node.getTranslateX() > GameConfig.WIDTH + 50) {
             active = false;
         }
     }
 
     private void checkCollision(Fighter enemy) {
 
-        // ignorar al dueño del proyectil
-        if (enemy == owner) {
-            return;
-        }
+        if (enemy == owner) return;
 
-        double dx = Math.abs(sprite.getTranslateX() - enemy.getX());
+        double dx = Math.abs(node.getTranslateX() - enemy.getX());
 
         if (dx < HITBOX) {
 
+            // aplicar daño del proyectil
             enemy.damage(GameConfig.MOLAR_SPECIAL_DAMAGE / 6);
-            enemy.applyKnockback(owner, GameConfig.KNOCKBACK_FORCE);
 
+            // desactivar proyectil tras impactar
             active = false;
         }
     }
