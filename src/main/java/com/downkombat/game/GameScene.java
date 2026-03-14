@@ -45,7 +45,7 @@ public class GameScene {
     private ProjectileManager projectileManager;
     private CarManager carManager;
 
-    public GameScene(CharacterType p1Type, CharacterType p2Type) {
+    public GameScene(CharacterType p1Type, CharacterType p2Type, String map) {
 
         this.p1Type = p1Type;
         this.p2Type = p2Type;

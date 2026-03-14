@@ -94,16 +94,11 @@ public class CharacterSelectScene {
         updateTexts();
 
         if (p1Locked && p2Locked) {
-
-            main.startGame(
-                    characters[p1Index],
-                    characters[p2Index]
-            );
+            main.showSelectMap(characters[p2Index].name());
         }
     }
 
     private void updateTexts() {
-
         p1Text.setText("P1: " + characters[p1Index]);
         p2Text.setText("P2: " + characters[p2Index]);
     }
