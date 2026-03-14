@@ -4,16 +4,25 @@ import com.downkombat.combat.SpecialAttack;
 import com.downkombat.combat.projectiles.Projectile;
 import com.downkombat.combat.projectiles.ProjectileManager;
 import com.downkombat.fighters.Fighter;
+
 import javafx.scene.paint.Color;
 
 public class MolarAttack implements SpecialAttack {
 
-    private ProjectileManager projectileManager;
+    private final ProjectileManager projectileManager;
 
     private int shotsRemaining = 0;
     private long nextShotTime = 0;
 
     private boolean direction;
+    private boolean active = false;
+
+    // offsets para alinear con la boca
+    private static final double MOUTH_OFFSET_X = 60;
+    private static final double MOUTH_OFFSET_Y = 355;
+
+    private static final int SHOT_DELAY = 80;
+    private static final int BURST_SIZE = 6;
 
     public MolarAttack(ProjectileManager projectileManager) {
         this.projectileManager = projectileManager;
@@ -22,23 +31,25 @@ public class MolarAttack implements SpecialAttack {
     @Override
     public void execute(Fighter attacker, Fighter defender) {
 
-        // iniciar ráfaga de muelas
-        shotsRemaining = 6;
+        shotsRemaining = BURST_SIZE;
         nextShotTime = System.currentTimeMillis();
 
-        // guardar dirección real del personaje
         direction = attacker.isFacingRight();
 
-        // animación: Soraya abre la boca
+        active = true;
+
+        // efecto visual
         attacker.setColor(Color.PINK);
     }
 
     @Override
     public void update(Fighter attacker) {
 
+        if (!active) return;
+
         if (shotsRemaining <= 0) {
-            // restaurar color cuando termina la ráfaga
-            attacker.setColor(attacker.getOriginalColor());
+            attacker.resetColor();
+            active = false;
             return;
         }
 
@@ -46,18 +57,20 @@ public class MolarAttack implements SpecialAttack {
 
         if (now >= nextShotTime) {
 
-            // spawn delante del personaje
             double spawnX = attacker.getX();
 
             if (direction) {
-                spawnX += 70;
+                spawnX += MOUTH_OFFSET_X;
             } else {
-                spawnX -= 70;
+                spawnX -= MOUTH_OFFSET_X;
             }
+
+            double spawnY =
+                    attacker.getNode().getTranslateY() - MOUTH_OFFSET_Y;
 
             Projectile molar = new Projectile(
                     spawnX,
-                    attacker.getNode().getTranslateY() - 120,
+                    spawnY,
                     direction,
                     attacker
             );
@@ -65,7 +78,7 @@ public class MolarAttack implements SpecialAttack {
             projectileManager.spawn(molar);
 
             shotsRemaining--;
-            nextShotTime = now + 80;
+            nextShotTime = now + SHOT_DELAY;
         }
     }
 }

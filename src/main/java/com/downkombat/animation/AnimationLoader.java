@@ -39,7 +39,7 @@ public class AnimationLoader {
             File folder = new File(url.toURI());
 
             File[] files = folder.listFiles((dir, name) ->
-                    name.toLowerCase().endsWith(".png")
+                    name.toLowerCase().matches(".*\\d+\\.png")
             );
 
             if (files == null) return;
@@ -65,38 +65,39 @@ public class AnimationLoader {
         }
     }
 
-    public static List<Image> loadSpecial(String folderPath) {
+public static List<Image> loadSpecial(String folderPath) {
 
-        List<Image> frames = new ArrayList<>();
+    List<Image> frames = new ArrayList<>();
 
-        try {
+    try {
 
-            URL url = AnimationLoader.class.getResource(folderPath);
+        URL url = AnimationLoader.class.getResource(folderPath);
 
-            if (url == null) return frames;
+        if (url == null) return frames;
 
-            File folder = new File(url.toURI());
+        File folder = new File(url.toURI());
 
-            File[] files = folder.listFiles((dir, name) ->
-                    name.toLowerCase().endsWith(".png")
-            );
+        File[] files = folder.listFiles((dir, name) ->
+                name.toLowerCase().matches("^special_\\d+\\.png$")
+        );
 
-            if (files == null) return frames;
+        if (files == null) return frames;
 
-            Arrays.sort(files, (a, b) ->
-                    a.getName().compareToIgnoreCase(b.getName())
-            );
+        Arrays.sort(files, (a, b) ->
+                a.getName().compareToIgnoreCase(b.getName())
+        );
 
-            for (File file : files) {
-                frames.add(new Image(file.toURI().toString()));
-            }
-
-        } catch (Exception e) {
-
-            System.out.println("Failed loading special animation: " + folderPath);
-
+        for (File file : files) {
+            frames.add(new Image(file.toURI().toString()));
         }
 
-        return frames;
+    } catch (Exception e) {
+
+        System.out.println("Failed loading special animation: " + folderPath);
+
     }
+
+    return frames;
+}
+
 }

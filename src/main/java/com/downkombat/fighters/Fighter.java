@@ -106,18 +106,14 @@ public class Fighter {
                     "/sprites/fighters/" + fighterId + "/special"
             );
 
-            // intenta cargar animaciones de transformación
             specialAnimations = AnimationLoader.load(
                     "/sprites/fighters/" + fighterId + "/special"
             );
 
-              // si no hay animaciones intenta cargar frames simples
             if (specialAnimations == null || specialAnimations.isEmpty()) {
-
                 specialFrames = AnimationLoader.loadSpecial(
                         "/sprites/fighters/" + fighterId + "/special"
                 );
-
             }
 
             playAnimation(AnimationState.IDLE);
@@ -141,7 +137,6 @@ public class Fighter {
     private void playAnimation(AnimationState state) {
 
         Map<AnimationState, List<Image>> animations = currentAnimations();
-
         List<Image> frames = animations.get(state);
 
         if (frames != null && !frames.isEmpty()) {
@@ -176,25 +171,22 @@ public class Fighter {
 
         specialAttack.execute(this, enemy);
 
-            if (specialFrames != null && !specialFrames.isEmpty()) {
+        if (specialFrames != null && !specialFrames.isEmpty()) {
 
-        animationPlayer.play(specialFrames, 90);
+            animationPlayer.play(specialFrames, 90);
 
-        specialStateEndTime =
-                System.currentTimeMillis() + SPECIAL_ANIMATION_DURATION;
+            specialStateEndTime =
+                    System.currentTimeMillis() + SPECIAL_ANIMATION_DURATION;
 
-        currentState = AnimationState.SPECIAL;
+            currentState = AnimationState.SPECIAL;
+            return;
+        }
 
-        return;
-    }
+        if (specialAnimations != null && !specialAnimations.isEmpty()) {
 
-    // SPECIAL TIPO TRANSFORMACIÓN
-    if (specialAnimations != null && !specialAnimations.isEmpty()) {
-
-        transformed = !transformed;
-
-        playAnimation(AnimationState.IDLE);
-    }
+            transformed = !transformed;
+            playAnimation(AnimationState.IDLE);
+        }
     }
 
     public void damage(int amount) {
@@ -241,111 +233,102 @@ public class Fighter {
         playAnimation(newState);
     }
 
-// --- MÉTODOS COMPATIBLES CON EL RESTO DEL ENGINE ---
-
-public void setX(double x) {
-    node.setTranslateX(x);
-}
-
-public int getHealth() {
-    return health;
-}
-
-public boolean canAttack() {
-    long now = System.currentTimeMillis();
-    return now - lastAttackTime >= GameConfig.ATTACK_COOLDOWN;
-}
-
-public boolean canSpecial() {
-    long now = System.currentTimeMillis();
-    return now - lastSpecialTime >= GameConfig.SPECIAL_COOLDOWN;
-}
-
-public boolean isNear(Fighter other) {
-    double distance = Math.abs(getX() - other.getX());
-    return distance < GameConfig.ATTACK_RANGE;
-}
-
-public boolean isFacing(Fighter other) {
-
-    double otherX = other.getX();
-
-    if (otherX > getX()) {
-        return facingRight;
-    } else {
-        return !facingRight;
+    public void setX(double x) {
+        node.setTranslateX(x);
     }
-}
 
-public void applyKnockback(Fighter attacker, int force) {
-
-    if (attacker.getX() < this.getX()) {
-        node.setTranslateX(node.getTranslateX() + force);
-    } else {
-        node.setTranslateX(node.getTranslateX() - force);
+    public int getHealth() {
+        return health;
     }
-}
 
-public void setColor(Color color) {
+    public boolean canAttack() {
+        long now = System.currentTimeMillis();
+        return now - lastAttackTime >= GameConfig.ATTACK_COOLDOWN;
+    }
 
-    sprite.setStyle(
-        "-fx-effect: dropshadow(gaussian, " +
-        "rgba(" +
-        (int)(color.getRed()*255) + "," +
-        (int)(color.getGreen()*255) + "," +
-        (int)(color.getBlue()*255) + ",0.8)," +
-        "20,0.7,0,0)"
-    );
-}
+    public boolean canSpecial() {
+        long now = System.currentTimeMillis();
+        return now - lastSpecialTime >= GameConfig.SPECIAL_COOLDOWN;
+    }
 
-public void resetColor() {
-    sprite.setStyle(null);
-}
+    public boolean isNear(Fighter other) {
+        double distance = Math.abs(getX() - other.getX());
+        return distance < GameConfig.ATTACK_RANGE;
+    }
 
-public Color getOriginalColor() {
-    return Color.WHITE;
-}
+    public boolean isFacing(Fighter other) {
 
-public void setInvulnerable(boolean value) {
-    invulnerable = value;
-}
+        double otherX = other.getX();
+
+        if (otherX > getX()) {
+            return facingRight;
+        } else {
+            return !facingRight;
+        }
+    }
+
+    public void applyKnockback(Fighter attacker, int force) {
+
+        if (attacker.getX() < this.getX()) {
+            node.setTranslateX(node.getTranslateX() + force);
+        } else {
+            node.setTranslateX(node.getTranslateX() - force);
+        }
+    }
+
+    public void setColor(Color color) {
+
+        sprite.setStyle(
+                "-fx-effect: dropshadow(gaussian, " +
+                        "rgba(" +
+                        (int)(color.getRed()*255) + "," +
+                        (int)(color.getGreen()*255) + "," +
+                        (int)(color.getBlue()*255) + ",0.8)," +
+                        "20,0.7,0,0)"
+        );
+    }
+
+    public void resetColor() {
+        sprite.setStyle(null);
+    }
+
+    public Color getOriginalColor() {
+        return Color.WHITE;
+    }
+
+    public void setInvulnerable(boolean value) {
+        invulnerable = value;
+    }
 
     public void update() {
 
         long now = System.currentTimeMillis();
 
+        if (specialAttack != null) {
+            specialAttack.update(this);
+        }
+
         if (currentState == AnimationState.HIT && now >= hitStateEndTime) {
 
             setState(AnimationState.IDLE);
 
-        }
-
-        else if (currentState == AnimationState.ATTACK && now >= attackStateEndTime) {
+        } else if (currentState == AnimationState.ATTACK && now >= attackStateEndTime) {
 
             setState(AnimationState.IDLE);
 
-        }
-
-        else if (currentState == AnimationState.SPECIAL && now >= specialStateEndTime) {
+        } else if (currentState == AnimationState.SPECIAL && now >= specialStateEndTime) {
 
             setState(AnimationState.IDLE);
 
-        }
-
-        else if (currentState != AnimationState.ATTACK &&
-                 currentState != AnimationState.HIT &&
-                 currentState != AnimationState.SPECIAL) {
+        } else if (currentState != AnimationState.ATTACK &&
+                   currentState != AnimationState.HIT &&
+                   currentState != AnimationState.SPECIAL) {
 
             if (movedThisFrame) {
-
                 setState(AnimationState.WALK);
-
             } else {
-
                 setState(AnimationState.IDLE);
-
             }
-
         }
 
         animationPlayer.update();
@@ -361,11 +344,11 @@ public void setInvulnerable(boolean value) {
         return node.getTranslateX();
     }
 
-    public boolean isDead() {
-        return health <= 0;
-    }
-
     public boolean isFacingRight() {
         return facingRight;
+    }
+
+    public boolean isDead() {
+        return health <= 0;
     }
 }
