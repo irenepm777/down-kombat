@@ -9,54 +9,84 @@ import com.downkombat.config.GameConfig;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 public class Fighter {
 
+    // Unique identifier used to load the correct assets
     private final String fighterId;
 
+    // JavaFX node representing the fighter in the scene
     private final Group node;
+
+    // Sprite displayed on screen
     private final ImageView sprite;
+
+    // Handles animation frame playback
     private final AnimationPlayer animationPlayer;
 
+    // Normal animation set
     private Map<AnimationState, List<Image>> normalAnimations;
+
+    // Special animation set (used when transformed)
     private Map<AnimationState, List<Image>> specialAnimations;
+
+    // Special attack animation frames
     private List<Image> specialFrames;
 
+    // Indicates if the fighter is currently transformed
     private boolean transformed = false;
 
+    // Movement speed
     private final double speed = GameConfig.PLAYER_SPEED;
+
+    // Current health
     private int health = GameConfig.PLAYER_MAX_HEALTH;
 
+    // Current animation state
     private AnimationState currentState = AnimationState.IDLE;
 
+    // Orientation
     private boolean facingRight = true;
+
+    // Used for shield or temporary invulnerability
     private boolean invulnerable = false;
+
+    // Tracks movement per frame
     private boolean movedThisFrame = false;
 
+    // Attacks
     private final SpecialAttack normalAttack;
     private final SpecialAttack specialAttack;
 
+    // Cooldown tracking
     private long lastAttackTime = 0;
     private long lastSpecialTime = 0;
 
+    // Animation timers
     private long attackStateEndTime = 0;
     private long hitStateEndTime = 0;
     private long specialStateEndTime = 0;
 
+    // Original color (kept for potential visual effects)
     private final Color originalColor;
 
+    // Sprite size
     private static final double SPRITE_HEIGHT = 600;
 
+    // Animation frame durations
     private static final long IDLE_FRAME_DURATION = 220;
     private static final long WALK_FRAME_DURATION = 180;
     private static final long ATTACK_FRAME_DURATION = 140;
     private static final long HIT_FRAME_DURATION = 160;
     private static final long SPECIAL_FRAME_DURATION = 200;
 
+    // Animation total durations
     private static final long ATTACK_ANIMATION_DURATION = 500;
     private static final long HIT_ANIMATION_DURATION = 400;
     private static final long SPECIAL_ANIMATION_DURATION = 500;
@@ -77,11 +107,32 @@ public class Fighter {
 
         node = new Group();
 
-        Image image = new Image(
-                Fighter.class.getResource(
-                        "/sprites/fighters/" + fighterId + "/idle/idle_1.png"
-                ).toExternalForm()
-        );
+        // Load initial sprite
+        String spritePath =
+                "/sprites/fighters/" + fighterId + "/idle/idle_1.png";
+
+        System.out.println("Loading sprite: " + spritePath);
+
+        URL url = Fighter.class.getResource(spritePath);
+        Image image;
+
+        // Prevent crash if sprite is missing
+        if (url == null) {
+
+            System.out.println("Missing sprite: " + spritePath);
+
+            URL fallbackUrl = Fighter.class.getResource("/sprites/fallback.png");
+
+            if (fallbackUrl != null) {
+                image = new Image(fallbackUrl.toExternalForm());
+            } else {
+                System.out.println("Missing fallback sprite: /sprites/fallback.png");
+                image = new WritableImage(1, 1);
+            }
+
+        } else {
+            image = new Image(url.toExternalForm());
+        }
 
         sprite = new ImageView(image);
 
@@ -89,6 +140,7 @@ public class Fighter {
         sprite.setFitHeight(SPRITE_HEIGHT);
         sprite.setPreserveRatio(true);
 
+        // Align sprite with the ground
         sprite.setTranslateX(-SPRITE_HEIGHT / 4);
         sprite.setTranslateY(-SPRITE_HEIGHT);
 
@@ -97,6 +149,7 @@ public class Fighter {
         node.setTranslateX(x);
         node.setTranslateY(groundY);
 
+        // Flip sprite if spawned on the right side
         if (x > GameConfig.WIDTH / 2) {
             facingRight = false;
             sprite.setScaleX(-1);
@@ -106,14 +159,17 @@ public class Fighter {
 
         try {
 
+            // Load normal animations
             normalAnimations = AnimationLoader.load(
                     "/sprites/fighters/" + fighterId
             );
 
+            // Load transformed animations
             specialAnimations = AnimationLoader.load(
                     "/sprites/fighters/" + fighterId + "/special"
             );
 
+            // Load special attack animation
             specialFrames = AnimationLoader.loadSpecial(
                     "/sprites/fighters/" + fighterId + "/special"
             );
@@ -126,9 +182,13 @@ public class Fighter {
 
         } catch (Exception e) {
             System.out.println("Animation load failed for " + fighterId);
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Returns the current animation set depending on transformation state.
+     */
     private Map<AnimationState, List<Image>> currentAnimations() {
 
         if (transformed && specialAnimations != null) {
@@ -138,10 +198,12 @@ public class Fighter {
         return normalAnimations;
     }
 
+    /**
+     * Plays the animation corresponding to the given state.
+     */
     private void playAnimation(AnimationState state) {
 
         if (state == AnimationState.SPECIAL && specialFrames != null && !specialFrames.isEmpty()) {
-
             animationPlayer.play(specialFrames, SPECIAL_FRAME_DURATION, false);
             return;
         }
@@ -161,6 +223,9 @@ public class Fighter {
         }
     }
 
+    /**
+     * Performs a normal attack if cooldown allows it.
+     */
     public void performAttack(Fighter enemy) {
 
         if (!canAttack()) return;
@@ -174,6 +239,9 @@ public class Fighter {
         setState(AnimationState.ATTACK);
     }
 
+    /**
+     * Executes special ability.
+     */
     public void performSpecial(Fighter enemy) {
 
         if (!canSpecial()) return;
@@ -183,14 +251,14 @@ public class Fighter {
         specialAttack.execute(this, enemy);
 
         if (!fighterId.equals("juanma")) {
-
             setState(AnimationState.SPECIAL);
-
-            specialStateEndTime =
-                    System.currentTimeMillis() + SPECIAL_ANIMATION_DURATION;
+            specialStateEndTime = System.currentTimeMillis() + SPECIAL_ANIMATION_DURATION;
         }
     }
 
+    /**
+     * Forces special animation (used by transformation attacks).
+     */
     public void triggerSpecialAnimation() {
 
         setState(AnimationState.SPECIAL);
@@ -199,6 +267,9 @@ public class Fighter {
                 System.currentTimeMillis() + SPECIAL_ANIMATION_DURATION;
     }
 
+    /**
+     * Applies damage if the fighter is not invulnerable.
+     */
     public void damage(int amount) {
 
         if (invulnerable) return;
@@ -207,11 +278,8 @@ public class Fighter {
 
         if (health < 0) health = 0;
 
-        // IMPORTANTE: no interrumpir la animación SPECIAL (atropello de Juanma)
         if (currentState != AnimationState.SPECIAL) {
-
             hitStateEndTime = System.currentTimeMillis() + HIT_ANIMATION_DURATION;
-
             setState(AnimationState.HIT);
         }
     }
@@ -247,6 +315,9 @@ public class Fighter {
         playAnimation(newState);
     }
 
+    /**
+     * Update method called each frame by the game loop.
+     */
     public void update() {
 
         long now = System.currentTimeMillis();
@@ -293,14 +364,30 @@ public class Fighter {
 
     public int getHealth() { return health; }
 
-    public boolean canAttack() {
+    /**
+     * Enables or disables transformation state.
+     */
+    public void setTransformed(boolean value) {
+        transformed = value;
+    }
 
+    public boolean isTransformed() {
+        return transformed;
+    }
+
+    /**
+     * Enables or disables temporary invulnerability (used by shields).
+     */
+    public void setInvulnerable(boolean value) {
+        invulnerable = value;
+    }
+
+    public boolean canAttack() {
         return System.currentTimeMillis() - lastAttackTime
                 >= GameConfig.ATTACK_COOLDOWN;
     }
 
     public boolean canSpecial() {
-
         return System.currentTimeMillis() - lastSpecialTime
                 >= GameConfig.SPECIAL_COOLDOWN;
     }

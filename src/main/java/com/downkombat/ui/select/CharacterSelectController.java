@@ -29,25 +29,24 @@ public class CharacterSelectController {
 
     private void createScene() {
 
-    	// ======== 1. BACKGROUND VIDEO ========
-    	Media media = new Media(getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm());
-    	MediaPlayer mediaPlayer = new MediaPlayer(media);
+        // Background video
+        Media media = new Media(
+                getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm()
+        );
 
-    	// Make the video loop forever
-    	mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        mediaPlayer.play();
 
-    	mediaPlayer.play();
+        MediaView mediaView = new MediaView(mediaPlayer);
+        mediaView.setFitWidth(800);
+        mediaView.setFitHeight(600);
+        mediaView.setPreserveRatio(false);
 
-    	MediaView mediaView = new MediaView(mediaPlayer);
-    	mediaView.setFitWidth(800);
-    	mediaView.setFitHeight(600);
-    	mediaView.setPreserveRatio(false);
-
-     // ======== 2. TITLE ========
-        Text title = new Text(selectingPlayer1 ? "choose your fighter" : "choose your fighter");
+        // Title
+        Text title = new Text("choose your fighter");
         title.setStyle("-fx-font-size: 32px; -fx-fill: white;");
 
-        // Wrap the text in a container so background works
         StackPane titleBox = new StackPane(title);
         titleBox.setStyle(
             "-fx-padding: 12px 25px;" +
@@ -58,18 +57,18 @@ public class CharacterSelectController {
             "-fx-background-insets: 0, 1;"
         );
 
-        // ======== 3. GRID OF CHARACTER BUTTONS ========
+        // Character grid
         GridPane grid = new GridPane();
         grid.setHgap(20);
         grid.setVgap(20);
         grid.setAlignment(Pos.CENTER);
 
-        StackPane btn1 = createButton("marco_antonio");
-        StackPane btn2 = createButton("marco_dario");
-        StackPane btn3 = createButton("marco_juanma");
-        StackPane btn4 = createButton("marco_miguel");
-        StackPane btn5 = createButton("marco_pepe");
-        StackPane btn6 = createButton("marco_soraya");
+        StackPane btn1 = createButton("antonio", "marco_antonio");
+        StackPane btn2 = createButton("dario", "marco_dario");
+        StackPane btn3 = createButton("juanma", "marco_juanma");
+        StackPane btn4 = createButton("migue", "marco_migue");
+        StackPane btn5 = createButton("pepe", "marco_pepe");
+        StackPane btn6 = createButton("soraya", "marco_soraya");
 
         grid.add(btn1, 0, 0);
         grid.add(btn2, 1, 0);
@@ -87,11 +86,10 @@ public class CharacterSelectController {
         scene = new Scene(root, 800, 600);
     }
 
-    private StackPane createButton(String characterName) {
+    private StackPane createButton(String fighterId, String frameName) {
 
-        String path = "/frame/" + characterName + ".png";
+        String path = "/frame/" + frameName + ".png";
 
-        // Debug to check if the image exists
         System.out.println("Searching image: " + path);
         java.io.InputStream is = getClass().getResourceAsStream(path);
         System.out.println("Result: " + is);
@@ -113,7 +111,7 @@ public class CharacterSelectController {
             "-fx-padding: 0;"
         );
 
-        btn.setOnAction(e -> selectCharacter(characterName));
+        btn.setOnAction(e -> selectCharacter(fighterId));
 
         StackPane slot = new StackPane();
         slot.getChildren().addAll(frame, btn);

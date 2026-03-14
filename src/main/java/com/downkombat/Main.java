@@ -26,15 +26,15 @@ public class Main extends Application {
 
         this.stage = stage;
 
-        // Load arcade font used by menu UI
+        // Load retro menu font
         Font.loadFont(
-                "https://fonts.gstatic.com/s/pressstart2p/v11/e3t4euO8T-267oIAQAu6jDQyK3k.woff2",
-                10
+            "https://fonts.gstatic.com/s/pressstart2p/v11/e3t4euO8T-267oIAQAu6jDQyK3k.woff2",
+            10
         );
 
-        // Load background video once so UI screens can reuse it
+        // Load background video once for menu screens
         Media media = new Media(
-                getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm()
+            getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm()
         );
 
         backgroundVideo = new MediaPlayer(media);
@@ -55,39 +55,49 @@ public class Main extends Application {
         return backgroundVideo;
     }
 
+    // PLAYER 1 CHARACTER SELECT
+    public void showSelectP1() {
+
+        CharacterSelectController controller =
+            new CharacterSelectController(this, true);
+
+        stage.setTitle("DOWN KOMBAT - Select Player 1");
+        stage.setScene(controller.getScene());
+        stage.show();
+    }
+
+    // PLAYER 2 CHARACTER SELECT
     public void showSelectP2(String p1) {
 
         this.player1 = p1;
 
-        CharacterSelectController controller = new CharacterSelectController(this, false);
+        CharacterSelectController controller =
+            new CharacterSelectController(this, false);
 
         stage.setTitle("DOWN KOMBAT - Select Player 2");
         stage.setScene(controller.getScene());
     }
 
+    // MAP SELECT
     public void showSelectMap(String p2) {
 
         this.player2 = p2;
 
-        MapsSelectController controller = new MapsSelectController(this, true);
+        MapsSelectController controller =
+            new MapsSelectController(this, true);
 
         stage.setTitle("DOWN KOMBAT - Select Map");
         stage.setScene(controller.getScene());
     }
 
+    // START GAME
     public void startGame(String map) {
 
-        // Convert UI ids like "marco_antonio" → "ANTONIO"
-        String p1 = player1.replace("marco_", "").toUpperCase();
-        String p2 = player2.replace("marco_", "").toUpperCase();
-
-        CharacterType fighter1 = CharacterType.valueOf(p1);
-        CharacterType fighter2 = CharacterType.valueOf(p2);
-
         GameScene game = new GameScene(
-                fighter1,
-                fighter2,
-                map
+            this,
+            CharacterType.valueOf(player1.toUpperCase()),
+            CharacterType.valueOf(player2.toUpperCase()),
+            map
         );
 
         stage.setScene(game.getScene());

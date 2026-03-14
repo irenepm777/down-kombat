@@ -19,6 +19,9 @@ public class NepalShieldAttack implements SpecialAttack {
 
         endTime = System.currentTimeMillis() + DURATION;
 
+        // ACTIVATE SHIELD
+        attacker.setInvulnerable(true);
+
         System.out.println("PEPE ACTIVA NEPAL SHIELD");
     }
 
@@ -30,6 +33,9 @@ public class NepalShieldAttack implements SpecialAttack {
         if (System.currentTimeMillis() > endTime) {
 
             active = false;
+
+            // DISABLE SHIELD
+            attacker.setInvulnerable(false);
 
             System.out.println("NEPAL SHIELD TERMINA");
         }

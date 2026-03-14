@@ -31,8 +31,10 @@ public class TransformationAttack implements SpecialAttack {
         if (active) return;
 
         active = true;
-
         endTime = System.currentTimeMillis() + duration;
+
+        // ACTIVATE TRANSFORMATION
+        attacker.setTransformed(true);
 
         if (soundPath != null) {
             SoundManager.play(soundPath);
@@ -49,6 +51,9 @@ public class TransformationAttack implements SpecialAttack {
         if (System.currentTimeMillis() > endTime) {
 
             active = false;
+
+            // END TRANSFORMATION
+            attacker.setTransformed(false);
 
             if (soundPath != null) {
                 SoundManager.stop();
