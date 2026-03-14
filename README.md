@@ -1,6 +1,6 @@
 # down-kombat
 DOWN KOMBAT es un videojuego de lucha 2D en tiempo real desarrollado en Java + JavaFX como proyecto final de DAW, aplicando modelado UML, control de versiones con GitFlow y análisis de calidad del código.
-diagrama de clases
+DIAGRAMA DE CLASES
 ```mermaid
 classDiagram
 
@@ -70,7 +70,7 @@ CharacterSelectScene --> FighterFactory
 
 
 ```
-Diagrama de Casos de Uso
+DIAGRAMA DE CASOS DE USO
 
 ```mermaid
 flowchart LR
@@ -127,5 +127,18 @@ FightManager ->> Atacante: getAttack()
 Atacante ->> Objetivo: execute(ataque)
 Objetivo ->> Objetivo: receiveDamage()
 FightManager ->> SoundManager: play("hit_sound")
+
+```
+EXTRAS
+DIAGRAMA DE ESTADOS
+```mermaid
+stateDiagram-v2
+[*] --> Menu
+Menu --> SeleccionPersonaje
+SeleccionPersonaje --> Combate
+Combate --> Pausa
+Pausa --> Combate
+Combate --> GameOver
+GameOver --> Menu
 
 ```
