@@ -28,19 +28,34 @@ public class MapsSelectController {
 
     private void createScene() {
 
-        // ======== 1. BACKGROUND VIDEO ========
-        Media media = new Media(getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm());
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.play();
-        
-        MediaView mediaView = new MediaView(mediaPlayer);
-        mediaView.setFitWidth(800);
-        mediaView.setFitHeight(600);
-        mediaView.setPreserveRatio(false);
+    	// ======== 1. BACKGROUND VIDEO ========
+    	Media media = new Media(getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm());
+    	MediaPlayer mediaPlayer = new MediaPlayer(media);
+
+    	// Make the video loop forever
+    	mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+
+    	mediaPlayer.play();
+
+    	MediaView mediaView = new MediaView(mediaPlayer);
+    	mediaView.setFitWidth(800);
+    	mediaView.setFitHeight(600);
+    	mediaView.setPreserveRatio(false);
 
         // ======== 2. TITLE ========
-        Text title = new Text("Select Map");
+        Text title = new Text("choose your map");
         title.setStyle("-fx-font-size: 32px; -fx-fill: white;");
+
+        // Wrap the text in a container so background works
+        StackPane titleBox = new StackPane(title);
+        titleBox.setStyle(
+            "-fx-padding: 12px 25px;" +
+            "-fx-background-radius: 10;" +
+            "-fx-background-color:" +
+                "linear-gradient(from 0% 0% to 100% 0%, #4e2f14 0%, #5e3a18 50%, #4e2f14 100%)," +
+                "linear-gradient(#6b441e 0%, #3e2610 100%);" +
+            "-fx-background-insets: 0, 1;"
+        );
 
         // ======== 3. GRID OF MAP BUTTONS ========
         GridPane grid = new GridPane();
@@ -62,7 +77,7 @@ public class MapsSelectController {
         grid.add(btn5, 1, 1);
         grid.add(btn6, 2, 1);
 
-        VBox content = new VBox(30, title, grid);
+        VBox content = new VBox(30, titleBox, grid);
         content.setAlignment(Pos.CENTER);
 
         StackPane root = new StackPane();
