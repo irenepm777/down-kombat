@@ -1,143 +1,267 @@
-/* ============================================
-   STREET FIGHTER ARCADE MENU STYLES
-   ============================================ */
+/* =========================================================
+   DOWN KOMBAT — ARCADE MENU STYLES
+   Visual style inspired by classic arcade fighting games
+   ========================================================= */
 
-/* Importar fuente estilo arcade */
+
+/* ---------------------------------------------------------
+   Arcade Font
+   ---------------------------------------------------------
+   Press Start 2P reproduces the pixel aesthetic of
+   classic arcade cabinets. Fallback fonts ensure
+   visual consistency if the font fails to load.
+   --------------------------------------------------------- */
+
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-/* Fuentes alternativas si no se carga la principal */
 .root {
     -fx-font-family: 'Press Start 2P', 'Courier New', monospace;
 }
 
-/* ============================================
-   ESTILOS DEL TÍTULO DEL JUEGO
-   ============================================ */
+
+/* ---------------------------------------------------------
+   Game Title
+   ---------------------------------------------------------
+   Uses gradient fill + stroke + glow to emulate
+   retro arcade title screens (e.g. Street Fighter II).
+   The stroke improves readability against dynamic
+   backgrounds such as video or animated scenes.
+   --------------------------------------------------------- */
+
 #game-title {
     -fx-font-family: 'Press Start 2P', 'Courier New', monospace;
     -fx-font-size: 72px;
+
     -fx-fill: linear-gradient(to bottom, #FFD700, #FF8C00, #FF4500);
+
     -fx-stroke: #8B0000;
     -fx-stroke-width: 3px;
+
     -fx-text-alignment: center;
+
     -fx-effect: dropshadow(gaussian, #FFD700, 10, 0.5, 0, 0);
 }
 
-/* ============================================
-   ESTILOS BASE PARA BOTONES ARCADE
-   ============================================ */
+
+/* ---------------------------------------------------------
+   Base Arcade Button Style
+   ---------------------------------------------------------
+   Provides shared visual identity for all menu buttons.
+   Includes large padding and borders to resemble
+   arcade cabinet UI elements.
+   --------------------------------------------------------- */
+
 .arcade-button {
+
     -fx-font-family: 'Press Start 2P', 'Courier New', monospace;
+
     -fx-font-size: 28px;
     -fx-font-weight: bold;
+
     -fx-padding: 25px 60px;
-    -fx-cursor: hand;
+
     -fx-background-radius: 15px;
     -fx-border-radius: 15px;
+
     -fx-border-width: 5px;
+
     -fx-min-width: 350px;
     -fx-min-height: 80px;
+
     -fx-alignment: center;
+
+    -fx-cursor: hand;
 }
 
-/* ============================================
-   BOTÓN START - Estilo Rojo/Dorado
-   ============================================ */
+
+/* ---------------------------------------------------------
+   START Button
+   ---------------------------------------------------------
+   Red + gold palette references fighting game UIs.
+   Strong glow reinforces the "primary action" role.
+   --------------------------------------------------------- */
+
 #start-button {
+
     -fx-background-color: linear-gradient(to bottom, #DC143C, #8B0000);
+
     -fx-text-fill: #FFD700;
+
     -fx-border-color: #FFD700;
+
     -fx-effect: dropshadow(gaussian, #8B0000, 0, 0, 0, 8);
 }
 
+
 #start-button:hover {
+
     -fx-background-color: linear-gradient(to bottom, #FF1744, #DC143C);
+
     -fx-text-fill: #FFFF00;
+
     -fx-border-color: #FFFF00;
+
     -fx-effect: dropshadow(gaussian, #FF1744, 20, 0.7, 0, 0);
+
     -fx-translate-y: -4px;
 }
 
+
 #start-button:pressed {
+
     -fx-background-color: linear-gradient(to bottom, #8B0000, #DC143C);
+
     -fx-translate-y: 4px;
+
     -fx-effect: dropshadow(gaussian, #8B0000, 0, 0, 0, 4);
 }
 
-/* ============================================
-   BOTÓN TUTORIAL - Estilo Azul/Plateado
-   ============================================ */
+
+/* ---------------------------------------------------------
+   TUTORIAL Button
+   ---------------------------------------------------------
+   Blue palette visually differentiates secondary
+   navigation from the primary action button.
+   --------------------------------------------------------- */
+
 #tutorial-button {
+
     -fx-background-color: linear-gradient(to bottom, #1E90FF, #00008B);
+
     -fx-text-fill: #E0E0E0;
+
     -fx-border-color: #C0C0C0;
+
     -fx-effect: dropshadow(gaussian, #00008B, 0, 0, 0, 8);
 }
 
+
 #tutorial-button:hover {
+
     -fx-background-color: linear-gradient(to bottom, #00BFFF, #1E90FF);
+
     -fx-text-fill: #FFFFFF;
+
     -fx-border-color: #FFFFFF;
+
     -fx-effect: dropshadow(gaussian, #00BFFF, 20, 0.7, 0, 0);
+
     -fx-translate-y: -4px;
 }
 
+
 #tutorial-button:pressed {
+
     -fx-background-color: linear-gradient(to bottom, #00008B, #1E90FF);
+
     -fx-translate-y: 4px;
+
     -fx-effect: dropshadow(gaussian, #00008B, 0, 0, 0, 4);
 }
+
+
+/* ---------------------------------------------------------
+   Menu Container
+   ---------------------------------------------------------
+   Explicit transparency ensures the container does not
+   interfere with background video or images.
+   --------------------------------------------------------- */
 
 #menu-box {
     -fx-background-color: transparent;
 }
 
+
+/* ---------------------------------------------------------
+   Generic Back Button
+   ---------------------------------------------------------
+   Used in submenus. Dark translucent background keeps
+   it readable over video or animated scenes.
+   --------------------------------------------------------- */
+
 .btn-volver {
+
     -fx-background-color: rgba(0,0,0,0.45);
+
     -fx-text-fill: white;
+
     -fx-font-size: 20px;
+
     -fx-background-radius: 6;
+
     -fx-padding: 6 10 6 10;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 6, 0, 0, 2);
+
     -fx-border-color: transparent;
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 6, 0, 0, 2);
 }
 
-/* Sombra "pixel" (botón detrás, offset para efecto bloque) */
+
+/* ---------------------------------------------------------
+   Pixel Shadow Layer
+   ---------------------------------------------------------
+   Used to simulate pixel-art button depth by rendering
+   a black layer slightly offset behind the main button.
+   --------------------------------------------------------- */
+
 .btn-volver-pixel-shadow {
-    -fx-background-color: #000000; /* color de la sombra */
-    -fx-text-fill: transparent;    /* ocultar texto de la sombra (solo forma) */
-    -fx-font-family: "monospace";
+
+    -fx-background-color: #000000;
+
+    -fx-text-fill: transparent;
+
+    -fx-font-family: monospace;
+
     -fx-font-size: 20px;
+
     -fx-padding: 6 10 6 10;
+
     -fx-background-radius: 0;
     -fx-border-radius: 0;
+
     -fx-border-color: #000000;
     -fx-border-width: 3;
-    /* offset "pixelado": movemos el nodo shadow con translate en CSS no es fiable en JavaFX,
-       por eso en Java colocamos la sombra detrás con un pequeño translate manual si quieres
-       otro offset, ajusta botonPixelStack children translateX/Y. */
+
     -fx-effect: null;
 }
 
-/* Botón principal estilo pixel art */
+
+/* ---------------------------------------------------------
+   Pixel Art Main Button
+   ---------------------------------------------------------
+   Hard borders and no radius maintain a classic
+   pixel-art aesthetic.
+   --------------------------------------------------------- */
+
 .btn-volver-pixel-main {
-    -fx-background-color: linear-gradient(#f7c948 0%, #f0a500 100%); /* tono "amarillo pixel" */
+
+    -fx-background-color: linear-gradient(#f7c948 0%, #f0a500 100%);
+
     -fx-text-fill: #000000;
-    -fx-font-family: "monospace";
+
+    -fx-font-family: monospace;
+
     -fx-font-size: 20px;
+
     -fx-padding: 6 10 6 10;
+
     -fx-background-radius: 0;
     -fx-border-radius: 0;
+
     -fx-border-color: #000000;
     -fx-border-width: 3;
+
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.0), 0, 0, 0, 0); /* sin blur */
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.0), 0, 0, 0, 0);
 }
 
-/* Hover: efecto simple (mantener "cuadrado") */
+
+/* Hover state keeps rigid geometry to preserve pixel style */
+
 .btn-volver-pixel-main:hover {
-    -fx-background-color: linear-gradient(#ffd86b 0%, #ffb84a 100%);
-    -fx-translate-y: 0; /* no suavizar */
-}
 
-/* Si quieres texto más "pixelado" usa una fuente monoespaciada o añade una fuente pixel */
+    -fx-background-color: linear-gradient(#ffd86b 0%, #ffb84a 100%);
+
+    -fx-translate-y: 0;
+}

@@ -1,5 +1,7 @@
 package com.downkombat;
 
+import com.downkombat.fighters.CharacterType;
+import com.downkombat.game.GameScene;
 import com.downkombat.menuinicio.MenuInicio;
 
 import javafx.application.Application;
@@ -8,26 +10,32 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private Stage primaryStageRef;
+    private Stage stage;
 
     @Override
     public void start(Stage stage) {
 
-        this.primaryStageRef = stage;
+        this.stage = stage;
 
-        // Load Google Font BEFORE anything else
         Font.loadFont(
             "https://fonts.gstatic.com/s/pressstart2p/v11/e3t4euO8T-267oIAQAu6jDQyK3k.woff2",
             10
         );
 
-        // Start menu directly
-        startMenu(stage);
+        startMenu();
     }
 
-    public void startMenu(Stage stage) {
-        MenuInicio menu = new MenuInicio();
+    public void startMenu() {
+
+        MenuInicio menu = new MenuInicio(this);
         menu.start(stage);
+    }
+
+    public void startGame(CharacterType p1, CharacterType p2) {
+
+        GameScene game = new GameScene(p1, p2);
+
+        stage.setScene(game.getScene());
     }
 
     public static void main(String[] args) {
