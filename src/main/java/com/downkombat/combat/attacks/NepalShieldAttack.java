@@ -2,7 +2,6 @@ package com.downkombat.combat.attacks;
 
 import com.downkombat.combat.SpecialAttack;
 import com.downkombat.fighters.Fighter;
-import javafx.scene.paint.Color;
 
 public class NepalShieldAttack implements SpecialAttack {
 
@@ -20,10 +19,6 @@ public class NepalShieldAttack implements SpecialAttack {
 
         endTime = System.currentTimeMillis() + DURATION;
 
-        attacker.setColor(Color.GOLD);
-
-        attacker.setInvulnerable(true);
-
         System.out.println("PEPE ACTIVA NEPAL SHIELD");
     }
 
@@ -33,10 +28,6 @@ public class NepalShieldAttack implements SpecialAttack {
         if (!active) return;
 
         if (System.currentTimeMillis() > endTime) {
-
-            attacker.setInvulnerable(false);
-
-            attacker.resetColor();
 
             active = false;
 

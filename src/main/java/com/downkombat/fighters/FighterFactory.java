@@ -34,8 +34,7 @@ public class FighterFactory {
                         new TransformationAttack(
                                 15000,
                                 15,
-                                60,
-                                Color.DARKRED
+                                60
                         )
                 );
 
@@ -59,8 +58,7 @@ public class FighterFactory {
                         new TransformationAttack(
                                 15000,
                                 15,
-                                60,
-                                Color.DARKGREEN
+                                60
                         )
                 );
 
@@ -75,7 +73,6 @@ public class FighterFactory {
                                 15000,
                                 15,
                                 60,
-                                Color.MEDIUMPURPLE,
                                 "/sounds/dario_golden.mp3"
                         )
                 );

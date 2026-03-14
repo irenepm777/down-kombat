@@ -5,8 +5,6 @@ import com.downkombat.combat.projectiles.Projectile;
 import com.downkombat.combat.projectiles.ProjectileManager;
 import com.downkombat.fighters.Fighter;
 
-import javafx.scene.paint.Color;
-
 public class MolarAttack implements SpecialAttack {
 
     private final ProjectileManager projectileManager;
@@ -17,9 +15,8 @@ public class MolarAttack implements SpecialAttack {
     private boolean direction;
     private boolean active = false;
 
-    // offsets para alinear con la boca
     private static final double MOUTH_OFFSET_X = 60;
-    private static final double MOUTH_OFFSET_Y = 355;
+    private static final double MOUTH_OFFSET_Y = 420;
 
     private static final int SHOT_DELAY = 80;
     private static final int BURST_SIZE = 6;
@@ -35,11 +32,7 @@ public class MolarAttack implements SpecialAttack {
         nextShotTime = System.currentTimeMillis();
 
         direction = attacker.isFacingRight();
-
         active = true;
-
-        // efecto visual
-        attacker.setColor(Color.PINK);
     }
 
     @Override
@@ -48,7 +41,6 @@ public class MolarAttack implements SpecialAttack {
         if (!active) return;
 
         if (shotsRemaining <= 0) {
-            attacker.resetColor();
             active = false;
             return;
         }
@@ -65,8 +57,7 @@ public class MolarAttack implements SpecialAttack {
                 spawnX -= MOUTH_OFFSET_X;
             }
 
-            double spawnY =
-                    attacker.getNode().getTranslateY() - MOUTH_OFFSET_Y;
+            double spawnY = attacker.getNode().getTranslateY() - MOUTH_OFFSET_Y;
 
             Projectile molar = new Projectile(
                     spawnX,

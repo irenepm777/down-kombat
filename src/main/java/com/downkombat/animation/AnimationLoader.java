@@ -29,20 +29,17 @@ public class AnimationLoader {
             AnimationState state,
             String folderPath
     ) {
-
         try {
-
             URL url = AnimationLoader.class.getResource(folderPath);
-
             if (url == null) return;
 
             File folder = new File(url.toURI());
 
             File[] files = folder.listFiles((dir, name) ->
-                    name.toLowerCase().matches(".*\\d+\\.png")
+                    name.toLowerCase().endsWith(".png")
             );
 
-            if (files == null) return;
+            if (files == null || files.length == 0) return;
 
             Arrays.sort(files, (a, b) ->
                     a.getName().compareToIgnoreCase(b.getName())
@@ -59,45 +56,38 @@ public class AnimationLoader {
             }
 
         } catch (Exception e) {
-
             System.out.println("Failed loading animation: " + folderPath);
-
         }
     }
 
-public static List<Image> loadSpecial(String folderPath) {
+    public static List<Image> loadSpecial(String folderPath) {
 
-    List<Image> frames = new ArrayList<>();
+        List<Image> frames = new ArrayList<>();
 
-    try {
+        try {
+            URL url = AnimationLoader.class.getResource(folderPath);
+            if (url == null) return frames;
 
-        URL url = AnimationLoader.class.getResource(folderPath);
+            File folder = new File(url.toURI());
 
-        if (url == null) return frames;
+            File[] files = folder.listFiles((dir, name) ->
+                    name.toLowerCase().matches("^special_\\d+\\.png$")
+            );
 
-        File folder = new File(url.toURI());
+            if (files == null || files.length == 0) return frames;
 
-        File[] files = folder.listFiles((dir, name) ->
-                name.toLowerCase().matches("^special_\\d+\\.png$")
-        );
+            Arrays.sort(files, (a, b) ->
+                    a.getName().compareToIgnoreCase(b.getName())
+            );
 
-        if (files == null) return frames;
+            for (File file : files) {
+                frames.add(new Image(file.toURI().toString()));
+            }
 
-        Arrays.sort(files, (a, b) ->
-                a.getName().compareToIgnoreCase(b.getName())
-        );
-
-        for (File file : files) {
-            frames.add(new Image(file.toURI().toString()));
+        } catch (Exception e) {
+            System.out.println("Failed loading special animation: " + folderPath);
         }
 
-    } catch (Exception e) {
-
-        System.out.println("Failed loading special animation: " + folderPath);
-
+        return frames;
     }
-
-    return frames;
-}
-
 }

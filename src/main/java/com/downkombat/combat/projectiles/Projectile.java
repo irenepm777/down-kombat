@@ -9,11 +9,11 @@ import javafx.scene.image.ImageView;
 
 public class Projectile {
 
-    private Group node;
-    private ImageView sprite;
+    private final Group node;
+    private final ImageView sprite;
 
-    private boolean movingRight;
-    private Fighter owner;
+    private final boolean movingRight;
+    private final Fighter owner;
 
     private boolean active = true;
 
@@ -29,16 +29,14 @@ public class Projectile {
 
         Image image = new Image(
                 Projectile.class.getResource(
-                        "/sprites/fighters/soraya/special/molar.PNG"
+                        "/sprites/projectiles/molar.png"
                 ).toExternalForm()
         );
 
         sprite = new ImageView(image);
-
         sprite.setFitWidth(40);
         sprite.setPreserveRatio(true);
 
-        // si va hacia la izquierda, voltear sprite
         if (!movingRight) {
             sprite.setScaleX(-1);
         }
@@ -82,9 +80,10 @@ public class Projectile {
 
         if (dx < HITBOX) {
 
+            // aplicar daño del proyectil
             enemy.damage(GameConfig.MOLAR_SPECIAL_DAMAGE / 6);
-            enemy.applyKnockback(owner, GameConfig.KNOCKBACK_FORCE);
 
+            // desactivar proyectil tras impactar
             active = false;
         }
     }

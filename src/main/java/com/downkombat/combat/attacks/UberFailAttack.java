@@ -3,12 +3,11 @@ package com.downkombat.combat.attacks;
 import com.downkombat.combat.SpecialAttack;
 import com.downkombat.combat.projectiles.Car;
 import com.downkombat.combat.projectiles.CarManager;
-import com.downkombat.config.GameConfig;
 import com.downkombat.fighters.Fighter;
 
 public class UberFailAttack implements SpecialAttack {
 
-    private CarManager carManager;
+    private final CarManager carManager;
 
     public UberFailAttack(CarManager carManager) {
         this.carManager = carManager;
@@ -19,9 +18,22 @@ public class UberFailAttack implements SpecialAttack {
 
         System.out.println("JUANMA LLAMA UN UBER");
 
+        boolean direction = attacker.isFacingRight();
+
+        double spawnX;
+
+        if (direction) {
+            spawnX = -200;
+        } else {
+            spawnX = 1600;
+        }
+
+        double spawnY = attacker.getNode().getTranslateY() - 400;
+
         Car car = new Car(
-                -150,
-                GameConfig.GROUND_Y - 20,
+                spawnX,
+                spawnY,
+                direction,
                 attacker
         );
 
@@ -30,6 +42,6 @@ public class UberFailAttack implements SpecialAttack {
 
     @Override
     public void update(Fighter attacker) {
-
+        // sin lógica continua
     }
 }

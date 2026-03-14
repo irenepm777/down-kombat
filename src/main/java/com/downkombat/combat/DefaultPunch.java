@@ -8,12 +8,13 @@ public class DefaultPunch implements SpecialAttack {
     @Override
     public void execute(Fighter attacker, Fighter defender) {
 
+        // aplicar daño directamente
         defender.damage(GameConfig.ATTACK_DAMAGE);
-        defender.applyKnockback(attacker, GameConfig.KNOCKBACK_FORCE);
+
     }
 
     @Override
     public void update(Fighter attacker) {
-        // no tiene estado temporal
+        // este ataque no necesita lógica extra
     }
 }

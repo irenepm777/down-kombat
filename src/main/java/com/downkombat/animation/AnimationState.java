@@ -1,6 +1,6 @@
 package com.downkombat.animation;
-public enum AnimationState {
 
+public enum AnimationState {
     IDLE,
     WALK,
     ATTACK,

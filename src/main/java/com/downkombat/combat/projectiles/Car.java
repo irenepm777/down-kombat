@@ -2,32 +2,58 @@ package com.downkombat.combat.projectiles;
 
 import com.downkombat.config.GameConfig;
 import com.downkombat.fighters.Fighter;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+
+import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class Car {
 
-    private Rectangle sprite;
+    private final Group node;
+    private final ImageView sprite;
 
-    private Fighter target;
+    private final boolean movingRight;
+    private final Fighter juanma;
 
     private boolean active = true;
+    private boolean collisionTriggered = false;
 
-    private static final double SPEED = 18;
+    private static final double SPEED = 12;
+    private static final int DAMAGE = 40;
 
-    public Car(double startX, double y, Fighter target) {
+    public Car(double x, double y, boolean movingRight, Fighter juanma) {
 
-        this.target = target;
+        this.movingRight = movingRight;
+        this.juanma = juanma;
 
-        sprite = new Rectangle(120, 40);
-        sprite.setFill(Color.YELLOW);
+        node = new Group();
 
-        sprite.setTranslateX(startX);
-        sprite.setTranslateY(y);
+        Image image = new Image(
+                Car.class.getResource("/sprites/projectiles/uber.png").toExternalForm()
+        );
+
+        sprite = new ImageView(image);
+
+        // tamaño del Uber
+        sprite.setFitWidth(750);
+        sprite.setPreserveRatio(true);
+
+        // ajustar posición visual del sprite
+        sprite.setTranslateX(-120);
+        sprite.setTranslateY(-80);
+
+        if (!movingRight) {
+            sprite.setScaleX(-1);
+        }
+
+        node.getChildren().add(sprite);
+
+        node.setTranslateX(x);
+        node.setTranslateY(y);
     }
 
-    public Rectangle getNode() {
-        return sprite;
+    public Group getNode() {
+        return node;
     }
 
     public boolean isActive() {
@@ -38,24 +64,36 @@ public class Car {
 
         if (!active) return;
 
-        sprite.setTranslateX(sprite.getTranslateX() + SPEED);
-
-        checkCollision();
-
-        if (sprite.getTranslateX() > GameConfig.WIDTH + 200) {
-            active = false;
+        // mover coche
+        if (movingRight) {
+            node.setTranslateX(node.getTranslateX() + SPEED);
+        } else {
+            node.setTranslateX(node.getTranslateX() - SPEED);
         }
-    }
 
-    private void checkCollision() {
+        // detectar atropello
+        if (!collisionTriggered) {
 
-        double dx = Math.abs(sprite.getTranslateX() - target.getX());
+            double carCenter = node.getTranslateX() + 110;
+            double dx = Math.abs(carCenter - juanma.getX());
 
-        if (dx < 60) {
+            if (dx < 70) {
 
-            target.damage(20);
+                collisionTriggered = true;
 
-            target.setColor(Color.GRAY); // sprite atropellado
+                System.out.println("JUANMA ATROPELLADO");
+
+                // activar animación especial de Juanma
+                juanma.triggerSpecialAnimation();
+
+                // aplicar daño
+                juanma.damage(DAMAGE);
+            }
+        }
+
+        // eliminar coche fuera de pantalla
+        if (node.getTranslateX() < -400 ||
+            node.getTranslateX() > GameConfig.WIDTH + 400) {
 
             active = false;
         }

@@ -10,30 +10,38 @@ public class AnimationPlayer {
     private final ImageView sprite;
 
     private List<Image> frames;
-
     private int currentFrame = 0;
 
     private long frameDuration = 100;
     private long lastFrameTime = 0;
+
+    private boolean loop = true;
 
     public AnimationPlayer(ImageView sprite) {
         this.sprite = sprite;
     }
 
     public void play(List<Image> frames, long frameDuration) {
+        play(frames, frameDuration, true);
+    }
+
+    public void play(List<Image> frames, long frameDuration, boolean loop) {
 
         if (frames == null || frames.isEmpty()) return;
 
         this.frames = frames;
         this.frameDuration = frameDuration;
+        this.loop = loop;
 
         currentFrame = 0;
+        lastFrameTime = System.currentTimeMillis();
+
         sprite.setImage(frames.get(0));
     }
 
     public void update() {
 
-        if (frames == null) return;
+        if (frames == null || frames.isEmpty()) return;
 
         long now = System.currentTimeMillis();
 
@@ -42,11 +50,14 @@ public class AnimationPlayer {
             currentFrame++;
 
             if (currentFrame >= frames.size()) {
-                currentFrame = 0;
+                if (loop) {
+                    currentFrame = 0;
+                } else {
+                    currentFrame = frames.size() - 1;
+                }
             }
 
             sprite.setImage(frames.get(currentFrame));
-
             lastFrameTime = now;
         }
     }
