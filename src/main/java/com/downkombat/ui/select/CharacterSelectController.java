@@ -32,8 +32,6 @@ public class CharacterSelectController {
         // ======== 1. BACKGROUND VIDEO ========
         Media media = new Media(getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm());
         MediaPlayer mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-        mediaPlayer.setMute(true);
         mediaPlayer.play();
 
         MediaView mediaView = new MediaView(mediaPlayer);

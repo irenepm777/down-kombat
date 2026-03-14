@@ -6,6 +6,8 @@ import com.downkombat.ui.select.CharacterSelectController;
 import com.downkombat.ui.select.MapsSelectController;
 
 import javafx.application.Application;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -15,8 +17,17 @@ public class Main extends Application {
     private String player1;
     private String player2;
 
+    private MediaPlayer backgroundVideo;
+
     @Override
     public void start(Stage stage) {
+
+        // Load background video ONCE
+        Media media = new Media(getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm());
+        backgroundVideo = new MediaPlayer(media);
+        backgroundVideo.setCycleCount(MediaPlayer.INDEFINITE);
+        backgroundVideo.setMute(true);
+        backgroundVideo.play();
 
         this.stage = stage;
 
@@ -28,7 +39,10 @@ public class Main extends Application {
         stage.show();
     }
 
-    // Called when Player 1 is selected
+    public MediaPlayer getBackgroundVideo() {
+        return backgroundVideo;
+    }
+
     public void showSelectP2(String p1) {
         this.player1 = p1;
 
@@ -38,7 +52,6 @@ public class Main extends Application {
         stage.setScene(controller.getScene());
     }
 
-    // Called when Player 2 is selected
     public void showSelectMap(String p2) {
         this.player2 = p2;
 
@@ -48,7 +61,6 @@ public class Main extends Application {
         stage.setScene(controller.getScene());
     }
 
-    // Called when map is selected
     public void startGame(String map) {
 
         GameScene game = new GameScene(
