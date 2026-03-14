@@ -1,6 +1,7 @@
 package com.downkombat.menuinicio;
 
 import com.downkombat.Main;
+import com.downkombat.ui.select.CharacterSelectController;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -55,7 +56,6 @@ public class MenuInicio extends Application {
         if (bgVideo != null) {
             root.getChildren().add(bgVideo);
         } else {
-
             ImageView bgImage = loadBackgroundImage();
 
             if (bgImage != null) {
@@ -103,13 +103,12 @@ public class MenuInicio extends Application {
 
         pauseMedia();
 
-        /*
-         * New architecture:
-         * Character selection is handled by CharacterSelectController
-         * through Main.showSelectP2()
-         */
+        // Start with PLAYER 1 selection
+        CharacterSelectController controller =
+                new CharacterSelectController(main, true);
 
-        main.showSelectP2(null);
+        primaryStageRef.setTitle("DOWN KOMBAT - Select Player 1");
+        primaryStageRef.setScene(controller.getScene());
     }
 
     private void handleTutorial() {
@@ -119,7 +118,6 @@ public class MenuInicio extends Application {
         pauseMedia();
 
         primaryStageRef.setOnShown(e -> {
-
             resumeMedia();
             primaryStageRef.setOnShown(null);
         });
@@ -151,7 +149,6 @@ public class MenuInicio extends Application {
     private void stopMusic() {
 
         if (musicPlayer != null) {
-
             musicPlayer.stop();
             musicPlayer.dispose();
             musicPlayer = null;
@@ -178,7 +175,6 @@ public class MenuInicio extends Application {
             );
 
             backgroundVideoPlayer.setOnReady(() -> {
-
                 backgroundVideoPlayer.setVolume(0.0);
                 backgroundVideoPlayer.play();
             });

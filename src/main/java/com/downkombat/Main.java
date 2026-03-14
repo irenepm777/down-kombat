@@ -26,16 +26,17 @@ public class Main extends Application {
 
         this.stage = stage;
 
-        // Load menu font
+        // Load arcade font used by menu UI
         Font.loadFont(
-            "https://fonts.gstatic.com/s/pressstart2p/v11/e3t4euO8T-267oIAQAu6jDQyK3k.woff2",
-            10
+                "https://fonts.gstatic.com/s/pressstart2p/v11/e3t4euO8T-267oIAQAu6jDQyK3k.woff2",
+                10
         );
 
-        // Load background video once so it can be reused by UI flows if needed
+        // Load background video once so UI screens can reuse it
         Media media = new Media(
                 getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm()
         );
+
         backgroundVideo = new MediaPlayer(media);
         backgroundVideo.setCycleCount(MediaPlayer.INDEFINITE);
         backgroundVideo.setMute(true);
@@ -55,6 +56,7 @@ public class Main extends Application {
     }
 
     public void showSelectP2(String p1) {
+
         this.player1 = p1;
 
         CharacterSelectController controller = new CharacterSelectController(this, false);
@@ -64,6 +66,7 @@ public class Main extends Application {
     }
 
     public void showSelectMap(String p2) {
+
         this.player2 = p2;
 
         MapsSelectController controller = new MapsSelectController(this, true);
@@ -74,9 +77,16 @@ public class Main extends Application {
 
     public void startGame(String map) {
 
+        // Convert UI ids like "marco_antonio" → "ANTONIO"
+        String p1 = player1.replace("marco_", "").toUpperCase();
+        String p2 = player2.replace("marco_", "").toUpperCase();
+
+        CharacterType fighter1 = CharacterType.valueOf(p1);
+        CharacterType fighter2 = CharacterType.valueOf(p2);
+
         GameScene game = new GameScene(
-                CharacterType.valueOf(player1.toUpperCase()),
-                CharacterType.valueOf(player2.toUpperCase()),
+                fighter1,
+                fighter2,
                 map
         );
 

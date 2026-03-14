@@ -20,6 +20,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 public class GameScene {
 
     private Scene scene;
@@ -50,6 +53,9 @@ public class GameScene {
         this.p2Type = p2Type;
 
         root = new Group();
+
+        // LOAD MAP BACKGROUND
+        loadMap(map);
 
         projectileManager = new ProjectileManager(root);
         carManager = new CarManager(root);
@@ -92,6 +98,31 @@ public class GameScene {
         return carManager;
     }
 
+    private void loadMap(String map) {
+
+        try {
+
+            String path = "/maps/" + map + ".png";
+
+            Image bg = new Image(
+                    getClass().getResourceAsStream(path)
+            );
+
+            ImageView background = new ImageView(bg);
+
+            background.setFitWidth(GameConfig.WIDTH);
+            background.setFitHeight(GameConfig.HEIGHT);
+
+            // background goes first so everything renders on top
+            root.getChildren().add(background);
+
+        } catch (Exception e) {
+
+            System.out.println("Map not found: " + map);
+
+        }
+    }
+
     private void spawnPlayers() {
 
         player1 = FighterFactory.create(
@@ -129,14 +160,14 @@ public class GameScene {
             return;
         }
 
-        // MOVIMIENTO
+        // MOVEMENT
         if (input.isPressed(KeyCode.A)) player1.moveLeft();
         if (input.isPressed(KeyCode.D)) player1.moveRight();
 
         if (input.isPressed(KeyCode.LEFT)) player2.moveLeft();
         if (input.isPressed(KeyCode.RIGHT)) player2.moveRight();
 
-        // LÍMITES
+        // SCREEN LIMITS
         clampToScreen(player1);
         clampToScreen(player2);
 
@@ -146,7 +177,7 @@ public class GameScene {
 
         double distance = Math.abs(player1.getX() - player2.getX());
 
-        // ATAQUE PLAYER 1
+        // PLAYER 1 ATTACK
         if (input.isPressed(KeyCode.F)
                 && distance < GameConfig.ATTACK_RANGE
                 && player1.canAttack()) {
@@ -157,7 +188,7 @@ public class GameScene {
                     System.currentTimeMillis() + GameConfig.HIT_FREEZE;
         }
 
-        // ATAQUE PLAYER 2
+        // PLAYER 2 ATTACK
         if (input.isPressed(KeyCode.K)
                 && distance < GameConfig.ATTACK_RANGE
                 && player2.canAttack()) {
@@ -168,7 +199,7 @@ public class GameScene {
                     System.currentTimeMillis() + GameConfig.HIT_FREEZE;
         }
 
-        // ESPECIALES
+        // SPECIALS
         if (input.isPressed(KeyCode.G) && player1.canSpecial()) {
             player1.performSpecial(player2);
         }
@@ -177,18 +208,18 @@ public class GameScene {
             player2.performSpecial(player1);
         }
 
-        // UPDATE PROYECTILES
+        // UPDATE PROJECTILES
         projectileManager.update(player1);
         projectileManager.update(player2);
 
-        // UPDATE COCHES
+        // UPDATE CARS
         carManager.update();
 
-        // ACTUALIZAR VIDAS
+        // UPDATE HEALTH
         healthBarP1.update(player1.getHealth());
         healthBarP2.update(player2.getHealth());
 
-        // FIN DE COMBATE
+        // GAME OVER
         if (player1.isDead()) {
 
             winText.setText("PLAYER 2 WINS\nPress R to restart");
