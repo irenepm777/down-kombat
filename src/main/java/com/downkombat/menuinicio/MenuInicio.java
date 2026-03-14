@@ -1,7 +1,6 @@
 package com.downkombat.menuinicio;
 
 import com.downkombat.Main;
-import com.downkombat.game.CharacterSelectScene;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -104,9 +103,13 @@ public class MenuInicio extends Application {
 
         pauseMedia();
 
-        CharacterSelectScene select = new CharacterSelectScene(main);
+        /*
+         * New architecture:
+         * Character selection is handled by CharacterSelectController
+         * through Main.showSelectP2()
+         */
 
-        primaryStageRef.setScene(select.getScene());
+        main.showSelectP2(null);
     }
 
     private void handleTutorial() {
@@ -118,7 +121,6 @@ public class MenuInicio extends Application {
         primaryStageRef.setOnShown(e -> {
 
             resumeMedia();
-
             primaryStageRef.setOnShown(null);
         });
 
@@ -178,7 +180,6 @@ public class MenuInicio extends Application {
             backgroundVideoPlayer.setOnReady(() -> {
 
                 backgroundVideoPlayer.setVolume(0.0);
-
                 backgroundVideoPlayer.play();
             });
 
@@ -205,7 +206,6 @@ public class MenuInicio extends Application {
 
             view.setFitWidth(SCREEN_WIDTH);
             view.setFitHeight(SCREEN_HEIGHT);
-
             view.setPreserveRatio(false);
 
             return view;
@@ -225,7 +225,6 @@ public class MenuInicio extends Application {
         );
 
         Rectangle bg = new Rectangle(SCREEN_WIDTH, SCREEN_HEIGHT);
-
         bg.setFill(gradient);
 
         return bg;
@@ -245,9 +244,7 @@ public class MenuInicio extends Application {
             Media media = new Media(url.toExternalForm());
 
             musicPlayer = new MediaPlayer(media);
-
             musicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-
             musicPlayer.play();
 
         } catch (Exception e) {
@@ -261,11 +258,8 @@ public class MenuInicio extends Application {
         VBox box = new VBox(40);
 
         box.setId("menu-box");
-
         box.setAlignment(Pos.CENTER);
-
         box.setTranslateY(100);
-
         box.setEffect(new Glow(0.2));
 
         return box;
@@ -276,17 +270,13 @@ public class MenuInicio extends Application {
         Text title = new Text("DOWN\nKOMBAT");
 
         title.setId("game-title");
-
         title.setFont(Font.font("Monospace", FontWeight.BOLD, 64));
 
         DropShadow shadow = new DropShadow();
-
         shadow.setColor(Color.ORANGE);
-
         shadow.setRadius(15);
 
         title.setEffect(shadow);
-
         title.setFill(Color.GOLD);
 
         return title;
@@ -297,11 +287,9 @@ public class MenuInicio extends Application {
         Button button = new Button(text);
 
         button.setId(styleId);
-
         button.getStyleClass().add("arcade-button");
 
         button.setMinWidth(300);
-
         button.setMinHeight(70);
 
         button.setOnMouseEntered(e -> {
@@ -321,7 +309,6 @@ public class MenuInicio extends Application {
         });
 
         button.setOnMousePressed(e -> button.setTranslateY(2));
-
         button.setOnMouseReleased(e -> button.setTranslateY(0));
 
         return button;
