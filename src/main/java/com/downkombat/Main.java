@@ -32,7 +32,7 @@ public class Main extends Application {
             10
         );
 
-        // Load background video once for menu screens
+        // Load background video used in menu screens
         Media media = new Media(
             getClass().getResource("/film/seleccion_personaje.mp4").toExternalForm()
         );
