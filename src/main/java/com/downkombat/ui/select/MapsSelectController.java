@@ -38,8 +38,8 @@ public class MapsSelectController {
     	mediaPlayer.play();
 
     	MediaView mediaView = new MediaView(mediaPlayer);
-    	mediaView.setFitWidth(800);
-    	mediaView.setFitHeight(600);
+    	mediaView.setFitWidth(1280);
+    	mediaView.setFitHeight(720);
     	mediaView.setPreserveRatio(false);
 
         // ======== 2. TITLE ========
@@ -83,7 +83,7 @@ public class MapsSelectController {
         StackPane root = new StackPane();
         root.getChildren().addAll(mediaView, content);
 
-        scene = new Scene(root, 800, 600);
+        scene = new Scene(root, 1280, 720);
     }
 
     private StackPane createButton(String mapName) {
