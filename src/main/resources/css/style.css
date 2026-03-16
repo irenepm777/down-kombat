@@ -265,3 +265,17 @@
 
     -fx-translate-y: 0;
 }
+
+.game-over-text {
+    -fx-font-size: 60px;
+    -fx-text-fill: #ff0000;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, black, 10, 0.8 , 0, 0);
+}
+.win-text {
+    -fx-font-size: 60px;
+    -fx-text-fill: #ffdd00;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}

@@ -96,6 +96,7 @@ public class GameScene {
         );
 
         scene = new Scene(root, GameConfig.WIDTH, GameConfig.HEIGHT);
+        scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
 
         input = new InputHandler(scene);
 
@@ -189,7 +190,7 @@ public class GameScene {
         endMenu = new VBox(20, restartButton, selectButton);
         endMenu.setAlignment(Pos.CENTER);
 
-        endMenu.setTranslateX(GameConfig.WIDTH / 2 - 110);
+        endMenu.setTranslateX(GameConfig.WIDTH / 2 - 100);
         endMenu.setTranslateY(GameConfig.HEIGHT / 2);
 
         endMenu.setVisible(false);
@@ -270,10 +271,13 @@ public class GameScene {
 
         winText.setText(text);
 
+        // APLICAR LA CLASE CSS DEL ARCHIVO style.css
+        if (!winText.getStyleClass().contains("win-text")) {
+            winText.getStyleClass().add("win-text");
+        }
+
         winText.setVisible(true);
-
         darkOverlay.setVisible(true);
-
         endMenu.setVisible(true);
 
         gameState = GameState.GAME_OVER;
